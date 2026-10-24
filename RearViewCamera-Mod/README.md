@@ -1,6 +1,6 @@
 # RearViewCamera
 
-TBD - ask the user and update this line.
+Client-only rear-view camera: a small live window on the HUD (hold or toggle key) and a full-screen rear view while a second key is held. Your character keeps facing forward.
 
 ## Features
 - (fill in)
