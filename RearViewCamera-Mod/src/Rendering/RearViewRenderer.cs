@@ -22,6 +22,7 @@ namespace RearViewCamera.Rendering
         bool _warnedNoPlayer;
         bool _creationFailureLogged;
         int _renders;
+        int _sameSizeRebuilds;
 
         internal RenderTexture Texture { get { return _texture; } }
         internal bool IsCreated { get { return _camera != null && _texture != null; } }
@@ -72,6 +73,12 @@ namespace RearViewCamera.Rendering
             RenderTextureFormat format = WantedFormat();
             if (_texture != null && _texture.width == width && _texture.height == height && _texture.format == format) return;
             string old = _texture != null ? _texture.width + "x" + _texture.height + " " + _texture.format : "none";
+            if (_texture != null && _texture.width == width && _texture.height == height)
+            {
+                _sameSizeRebuilds++;
+                // a same-size rebuild only happens when the game camera's HDR switches; more than that is a bug (expected 0, tolerance 1)
+                ModLog.Check("Renderer: same-size texture rebuilds while shown", _sameSizeRebuilds, 0, 1, "");
+            }
             ReleaseTexture();
             _texture = new RenderTexture(width, height, DepthBits, format)
             {
@@ -88,11 +95,14 @@ namespace RearViewCamera.Rendering
             ModLog.Verbose("Renderer: render texture " + old + " -> " + width + "x" + height + " " + format + " (created " + _texture.IsCreated() + ")");
         }
 
-        /// HDR texture when the game camera renders HDR (so the copied HDR setting has somewhere to go).
+        /// HDR texture when the game camera renders HDR (so the copied HDR setting has somewhere to go). A concrete format, never
+        /// DefaultHDR: a created texture reports the resolved format (ARGBHalf), so comparing with DefaultHDR re-created the texture
+        /// every frame (T-G003, session 20261025-051552).
         RenderTextureFormat WantedFormat()
         {
             Camera game = GameCameraNow();
-            return game != null && game.allowHDR ? RenderTextureFormat.DefaultHDR : RenderTextureFormat.ARGB32;
+            bool hdr = game != null && game.allowHDR && SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.ARGBHalf);
+            return hdr ? RenderTextureFormat.ARGBHalf : RenderTextureFormat.ARGB32;
         }
 
         /// The game's own camera (GameCamera component), looked up again only when GameCamera.instance changes.
@@ -187,7 +197,8 @@ namespace RearViewCamera.Rendering
                 Object.Destroy(_camera.gameObject);
                 _camera = null;
             }
-            ModLog.Verbose("Renderer: camera and render texture released after " + _renders + " render(s)");
+            ModLog.Verbose("Renderer: camera and render texture released after " + _renders + " render(s), " + _sameSizeRebuilds + " same-size rebuild(s)");
+            _sameSizeRebuilds = 0;
             return !IsCreated;
         }
 
