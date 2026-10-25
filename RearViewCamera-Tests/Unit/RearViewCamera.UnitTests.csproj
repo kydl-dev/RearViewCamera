@@ -5,4 +5,8 @@
     <AssemblyName>RearViewCamera.UnitTests</AssemblyName>
     <RootNamespace>RearViewCamera.Tests.Unit</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- pure rear-view logic (no Unity / Valheim types) -->
+    <Compile Include="..\..\RearViewCamera-Mod\src\Logic\*.cs" Link="Mod\Logic\%(Filename)%(Extension)" />
+  </ItemGroup>
 </Project>

@@ -15,15 +15,32 @@ namespace RearViewCamera.Testing
         static string Startup_ConfigBound()
         {
             if (ModSettings.EnableAll == null) return "FAIL: ModSettings.Bind did not run (EnableAll is null)";
-            return ModSettings.On ? "PASS: EnableAll on, menu key " + ModSettings.MenuKey.Value : "SKIP: EnableAll is off in the config";
+            return ModSettings.On
+                ? "PASS: EnableAll on, small key " + ModSettings.SmallCameraKey.Value + " (" + ModSettings.SmallCameraKeyMode.Value + "), full-screen key " + ModSettings.FullScreenKey.Value + ", height " + ModSettings.SmallHeight.Value + " px"
+                : "SKIP: EnableAll is off in the config";
         }
 
-        /// The local player exists once a world is loaded (example of a World_ test; replace with the mod's own checks).
-        static string World_PlayerPresent()
+        /// The small window would sit fully on screen, 16:9, under the minimap (computed with the controller's minimap lookup, nothing is shown).
+        static string World_SmallCameraLayout()
         {
-            var p = Player.m_localPlayer;
-            ModLog.Verbose("InGameTests: World_PlayerPresent player " + (p != null ? p.GetPlayerName() : "null"));
-            return p != null ? "PASS: " + p.GetPlayerName() + " at " + p.transform.position.ToString("F1") : "FAIL: no local player 5 s after the world loaded";
+            bool map = RearViewController.TryMinimapEdges(out float right, out float bottom);
+            var r = RearViewCamera.Logic.SmallCameraLayout.Place(UnityEngine.Screen.width, UnityEngine.Screen.height, ModSettings.SmallHeight.Value,
+                map ? right : (float?)null, map ? bottom : (float?)null, ModSettings.MinimapGap.Value, ModSettings.ScreenMargin.Value,
+                ModSettings.SmallOffsetX.Value, ModSettings.SmallOffsetY.Value);
+            ModLog.Verbose("InGameTests: World_SmallCameraLayout " + r + (map ? " (minimap right " + right.ToString("F0") + ", bottom " + bottom.ToString("F0") + " px)" : " (no minimap)"));
+            bool inside = r.X >= 0 && r.Y >= 0 && r.X + r.Width <= UnityEngine.Screen.width + 0.5f && r.Y + r.Height <= UnityEngine.Screen.height + 0.5f;
+            bool ratio = System.Math.Abs(r.Width - System.Math.Round(r.Height * 16.0 / 9.0)) < 0.5;
+            if (!inside) return "FAIL: small window " + r + " is not fully on the " + UnityEngine.Screen.width + "x" + UnityEngine.Screen.height + " screen";
+            if (!ratio) return "FAIL: small window " + r.Width + "x" + r.Height + " px is not 16:9";
+            if (!r.UnderMinimap) return "SKIP: no visible minimap, the window would be top-right: " + r;
+            return "PASS: " + r;
+        }
+
+        /// What is shown right now (manual test: press N / hold J, then PageDown to re-run).
+        static string World_ShownMode()
+        {
+            var mode = RearViewController.Shown;
+            return mode == RearViewCamera.Logic.RearViewMode.Off ? "SKIP: rear view is off (press N or hold J, then PageDown)" : "PASS: " + mode + (mode == RearViewCamera.Logic.RearViewMode.Small ? ", window " + RearViewController.LastRect : "");
         }
     }
 }

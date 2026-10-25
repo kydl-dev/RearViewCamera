@@ -10,13 +10,7 @@ namespace RearViewCamera.Ui
     {
         internal static readonly Dictionary<string, string> En = new Dictionary<string, string>
         {
-            { "rearviewcamera_menu_title", "RearViewCamera" },
-            { "rearviewcamera_menu_footer", "Esc to close" },
-            { "rearviewcamera_menu_section", "Example" },
-            { "rearviewcamera_menu_note", "This is the starting menu of the mod. Replace its content in MainMenuView." },
-            { "rearviewcamera_menu_example_switch", "Example switch" },
-            { "rearviewcamera_menu_example_slider", "Example value" },
-            { "rearviewcamera_menu_close", "Close" },
+            // no player-facing text yet: the rear view has no menu (D-018) and no warning box (D-012)
         };
 
 
