@@ -10,7 +10,8 @@ namespace RearViewCamera.Ui
     /// Unity-only preview of the rear-view HUD (NOT compiled into the mod: only Runtime/ is). Add this component to any GameObject of a
     /// scene and press Play: the small window shows at the place it has under the game's minimap (a 1920x1080 screen, minimap edges
     /// from the fields below), in the same look as in game. Tick `fullScreen` to see the full-screen view, `mirror` to flip it.
-    /// With a Main Camera in the scene the window shows what that camera sees backwards; without one, a test pattern.
+    /// With a camera in the scene the window shows what it sees backwards; without one, a test pattern.
+    /// The scene Preview.unity next to this file is set up for it (an untagged camera and objects behind it).
     /// Set the Game view to 1920x1080 (the panel scales from that like in game).
     /// </summary>
     public sealed class MenuPreview : MonoBehaviour
@@ -64,7 +65,7 @@ namespace RearViewCamera.Ui
         /// The scene seen backwards from the Main Camera, or a checker pattern when the scene has no camera.
         Texture MakeSource()
         {
-            var main = Camera.main;
+            var main = Camera.main != null ? Camera.main : FindFirstObjectByType<Camera>();   // untagged camera too: keeps screenshot tools on the composited Game view
             if (main != null)
             {
                 var rt = new RenderTexture(800, 450, 16) { name = "Preview_RearView" };
