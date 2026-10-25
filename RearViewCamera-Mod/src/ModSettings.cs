@@ -44,6 +44,8 @@ namespace RearViewCamera
             "Render-texture size of the small camera as a fraction of its on-screen size (1 = one rendered pixel per screen pixel).");
         public static readonly Tunable<float> FullScreenRenderScale = new Tunable<float>("Rendering", "FullScreenRenderScale", 0.5f, 0.25f, 1f,
             "Render-texture size of the full-screen view as a fraction of the screen resolution (lower = cheaper, blurrier).");
+        public static readonly Tunable<int> FullScreenMinHeight = new Tunable<int>("Rendering", "FullScreenMinHeight", FullScreenSize.DefaultMinHeight, 360, 2160,
+            "Lowest render height of the full-screen view, pixels (user: at least 1080p); never above the screen height.");
         public static readonly Tunable<float> MinimapGap = new Tunable<float>("Layout", "MinimapGap", 10f, 0f, 60f,
             "Space between the bottom of the minimap and the small camera, screen pixels.");
         public static readonly Tunable<float> ScreenMargin = new Tunable<float>("Layout", "ScreenMargin", 20f, 0f, 100f,

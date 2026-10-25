@@ -127,8 +127,10 @@ namespace RearViewCamera
             }
             else
             {
-                float scale = ModSettings.FullScreenRenderScale.Value;
-                if (!Renderer.Ensure(Mathf.RoundToInt(Screen.width * scale), Mathf.RoundToInt(Screen.height * scale))) { _hud.Hide(); return; }
+                FullScreenSize.For(Screen.width, Screen.height, ModSettings.FullScreenRenderScale.Value, ModSettings.FullScreenMinHeight.Value, out int fw, out int fh);
+                if (mode != _shown)
+                    ModLog.CheckRange("Controller: full-screen render height", fh, System.Math.Min(Screen.height, ModSettings.FullScreenMinHeight.Value), Screen.height, "px");
+                if (!Renderer.Ensure(fw, fh)) { _hud.Hide(); return; }
                 _hud.ShowFullScreen(Renderer.Texture, mirror);
             }
             if (mode != _shown) ModLog.Verbose("Controller: " + _shown + " -> " + mode + " (panel units per px " + toPanel.ToString("F3") + ")");
