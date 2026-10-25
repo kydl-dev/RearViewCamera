@@ -60,6 +60,7 @@ namespace RearViewCamera.Rendering
             _camera.allowMSAA = false;
             _camera.depth = -100f;
             ApplyCameraSettings();
+            CameraDiagnostics.WriteOnce(_camera);    // T-008: game camera vs rear camera, once per session
             ModLog.Verbose("Renderer: camera made (near " + _camera.nearClipPlane + " m, far " + _camera.farClipPlane + " m, FOV " + _camera.fieldOfView + " deg, culling mask 0x" + _camera.cullingMask.ToString("X8") + ")");
         }
 
