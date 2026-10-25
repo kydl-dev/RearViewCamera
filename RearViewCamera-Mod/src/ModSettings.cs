@@ -38,15 +38,12 @@ namespace RearViewCamera
         public static bool On { get { return EnableAll == null || EnableAll.Value; } }
 
         // --- dev-only fixed values (Tunables): not in the config file, KydlTools changes them for testing -----------------------------------
-        // Starting values picked by Claude-Agent-1 from the old RVC (render 1:1 for the small view, near 0.03 m, far 250 m); the user settles them in game.
+        // Starting values picked by Claude-Agent-1 (render 1:1 for the small view); the user settles them in game. Near / far clip, HDR, rendering path,
+        // depth textures, culling are copied from the game camera (T-008, user: "settings only"), so they are no Tunables.
         public static readonly Tunable<float> SmallRenderScale = new Tunable<float>("Rendering", "SmallRenderScale", 1f, 0.25f, 1f,
             "Render-texture size of the small camera as a fraction of its on-screen size (1 = one rendered pixel per screen pixel).");
         public static readonly Tunable<float> FullScreenRenderScale = new Tunable<float>("Rendering", "FullScreenRenderScale", 0.5f, 0.25f, 1f,
             "Render-texture size of the full-screen view as a fraction of the screen resolution (lower = cheaper, blurrier).");
-        public static readonly Tunable<float> NearClip = new Tunable<float>("Rendering", "NearClip", 0.03f, 0.01f, 0.5f,
-            "Rear camera near clip plane, metres.");
-        public static readonly Tunable<float> FarClip = new Tunable<float>("Rendering", "FarClip", 250f, 50f, 1000f,
-            "Rear camera far clip plane (view distance), metres.");
         public static readonly Tunable<float> MinimapGap = new Tunable<float>("Layout", "MinimapGap", 10f, 0f, 60f,
             "Space between the bottom of the minimap and the small camera, screen pixels.");
         public static readonly Tunable<float> ScreenMargin = new Tunable<float>("Layout", "ScreenMargin", 20f, 0f, 100f,

@@ -9,3 +9,4 @@ Write "not tested in game" for anything that was not run in game.
 - Full-screen rear view while J is held; the character keeps facing forward. Not tested in game.
 - Keys are ignored while chat, the console, Configuration Manager or a text field is open. Not tested in game.
 - Camera distance / height, field of view, update rate and mirror image in the config. Not tested in game.
+- The rear camera uses the game camera's render settings (HDR, view distance, depth). Not tested in game.

@@ -15,6 +15,9 @@ namespace RearViewCamera.Rendering
 
         Camera _camera;
         RenderTexture _texture;
+        GameCamera _gameCameraOwner;
+        Camera _gameCamera;
+        string _copiedFrom = "";
         float _nextRenderTime;
         bool _warnedNoPlayer;
         bool _creationFailureLogged;
@@ -31,7 +34,7 @@ namespace RearViewCamera.Rendering
         {
             width = Mathf.Max(16, width);
             height = Mathf.Max(16, height);
-            if (_camera != null && _texture != null && _texture.width == width && _texture.height == height)
+            if (_camera != null && _texture != null && _texture.width == width && _texture.height == height && _texture.format == WantedFormat())
                 return IsCreated;
             try
             {
@@ -66,10 +69,11 @@ namespace RearViewCamera.Rendering
 
         void EnsureTexture(int width, int height)
         {
-            if (_texture != null && _texture.width == width && _texture.height == height) return;
-            string old = _texture != null ? _texture.width + "x" + _texture.height : "none";
+            RenderTextureFormat format = WantedFormat();
+            if (_texture != null && _texture.width == width && _texture.height == height && _texture.format == format) return;
+            string old = _texture != null ? _texture.width + "x" + _texture.height + " " + _texture.format : "none";
             ReleaseTexture();
-            _texture = new RenderTexture(width, height, DepthBits, RenderTextureFormat.ARGB32)
+            _texture = new RenderTexture(width, height, DepthBits, format)
             {
                 name = "RearViewCamera_RenderTexture",
                 filterMode = FilterMode.Bilinear,
@@ -81,14 +85,58 @@ namespace RearViewCamera.Rendering
             _camera.targetTexture = _texture;
             _nextRenderTime = 0f;          // draw the first frame at once, never show an empty texture for a whole interval
             _renders = 0;
-            ModLog.Verbose("Renderer: render texture " + old + " -> " + width + "x" + height + " (created " + _texture.IsCreated() + ")");
+            ModLog.Verbose("Renderer: render texture " + old + " -> " + width + "x" + height + " " + format + " (created " + _texture.IsCreated() + ")");
         }
 
+        /// HDR texture when the game camera renders HDR (so the copied HDR setting has somewhere to go).
+        RenderTextureFormat WantedFormat()
+        {
+            Camera game = GameCameraNow();
+            return game != null && game.allowHDR ? RenderTextureFormat.DefaultHDR : RenderTextureFormat.ARGB32;
+        }
+
+        /// The game's own camera (GameCamera component), looked up again only when GameCamera.instance changes.
+        Camera GameCameraNow()
+        {
+            GameCamera owner = GameCamera.instance;
+            if (owner != _gameCameraOwner)
+            {
+                _gameCameraOwner = owner;
+                _gameCamera = owner != null ? owner.GetComponent<Camera>() : null;
+                _copiedFrom = "";
+                ModLog.Verbose("Renderer: game camera " + (_gameCamera != null ? "'" + _gameCamera.name + "'" : "not found (GameCamera.instance " + (owner != null) + ")"));
+            }
+            return _gameCamera;
+        }
+
+        /// T-008 (user: "settings only"): copy the game camera's render settings - HDR, rendering path, view distance, depth textures,
+        /// culling - so terrain, sky and distance look like the front view. No image effects, fog command buffer or post-processing.
+        /// FOV stays the player's config value. Without a game camera the Unity defaults stay.
         void ApplyCameraSettings()
         {
             _camera.fieldOfView = ModSettings.FieldOfView.Value;
-            _camera.nearClipPlane = ModSettings.NearClip.Value;
-            _camera.farClipPlane = ModSettings.FarClip.Value;
+            Camera game = GameCameraNow();
+            if (game == null) return;
+            _camera.renderingPath = game.renderingPath;
+            _camera.allowHDR = game.allowHDR;
+            _camera.allowMSAA = game.allowMSAA;
+            _camera.clearFlags = game.clearFlags;
+            _camera.backgroundColor = game.backgroundColor;
+            _camera.cullingMask = game.cullingMask;
+            _camera.nearClipPlane = game.nearClipPlane;
+            _camera.farClipPlane = game.farClipPlane;
+            _camera.depthTextureMode = game.depthTextureMode;
+            _camera.useOcclusionCulling = game.useOcclusionCulling;
+            _camera.layerCullSpherical = game.layerCullSpherical;
+            _camera.layerCullDistances = game.layerCullDistances;
+            string from = game.GetInstanceID().ToString();
+            if (from == _copiedFrom) return;
+            _copiedFrom = from;
+            ModLog.Verbose("Renderer: settings copied from game camera '" + game.name + "': path " + game.renderingPath + ", HDR " + game.allowHDR + ", MSAA " + game.allowMSAA
+                + ", clear " + game.clearFlags + ", mask 0x" + game.cullingMask.ToString("X8") + ", near/far " + game.nearClipPlane + "/" + game.farClipPlane + " m, depth texture "
+                + game.depthTextureMode + ", occlusion " + game.useOcclusionCulling + "; FOV " + _camera.fieldOfView + " deg (config)");
+            ModLog.Check("Renderer: rear far clip vs game camera", _camera.farClipPlane, game.farClipPlane, 0.01, "m");
+            ModLog.Check("Renderer: rear near clip vs game camera", _camera.nearClipPlane, game.nearClipPlane, 0.001, "m");
         }
 
         /// Renders this frame if the configured interval has passed. Expected outcome: returns whether a frame was rendered now.
