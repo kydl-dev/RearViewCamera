@@ -16,6 +16,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- the game's post-processing stack (v1): the rear camera copies the game's colour grading (D-022) -->
+    <Reference Include="assembly_postprocessing"><HintPath>$(ValheimRefs)\assembly_postprocessing.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- the mod's menu views live in the Unity project (previewed there) and are compiled into the mod from there -->
     <Compile Include="..\RearViewCamera-Unity\Assets\RearViewCamera_UI\Runtime\*.cs" Link="UiViews\%(Filename)%(Extension)" />
   </ItemGroup>

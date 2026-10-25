@@ -15,6 +15,7 @@ namespace RearViewCamera.Rendering
 
         Camera _camera;
         RenderTexture _texture;
+        readonly RearColorGrading _grading = new RearColorGrading();
         GameCamera _gameCameraOwner;
         Camera _gameCamera;
         string _copiedFrom = "";
@@ -65,6 +66,7 @@ namespace RearViewCamera.Rendering
             _camera.depth = -100f;
             ApplyCameraSettings();
             CameraDiagnostics.WriteOnce(_camera);    // T-008: game camera vs rear camera, once per session
+            _grading.Attach(_camera, GameCameraNow()); // D-022: the game's colour grading only
             ModLog.Verbose("Renderer: camera made (near " + _camera.nearClipPlane + " m, far " + _camera.farClipPlane + " m, FOV " + _camera.fieldOfView + " deg, culling mask 0x" + _camera.cullingMask.ToString("X8") + ")");
         }
 
@@ -192,6 +194,7 @@ namespace RearViewCamera.Rendering
         {
             if (_camera == null && _texture == null) return !IsCreated;
             ReleaseTexture();
+            _grading.Detach();
             if (_camera != null)
             {
                 Object.Destroy(_camera.gameObject);
