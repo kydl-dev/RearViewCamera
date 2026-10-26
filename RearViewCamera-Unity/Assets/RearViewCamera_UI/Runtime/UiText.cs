@@ -12,6 +12,8 @@ namespace RearViewCamera.Ui
         {
             // the rear view has no menu (D-018) and no warning box (D-012); these are one-line game messages
             { "rearviewcamera_msg_stepdown", "Rear view: an error happened, now running with {0}." },
+            { "rearviewcamera_msg_key_backup", "Rear view: {0} is also used by {1}. Using {2} this session - set a free key in the config ({3})." },
+            { "rearviewcamera_msg_key_off", "Rear view: {0} is used by {1} and {2} is taken too. This rear view is off until you set a free key in the config ({3})." },
             { "rearviewcamera_msg_off", "Rear view: switched off for this session after repeated errors (see the BepInEx log)." },
         };
 

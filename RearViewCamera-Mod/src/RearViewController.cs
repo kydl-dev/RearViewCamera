@@ -20,6 +20,7 @@ namespace RearViewCamera
         static readonly RearViewRenderer Renderer = new RearViewRenderer();
         static readonly RearViewInputBlocker Blocker = new RearViewInputBlocker();
         static readonly HudProbe Probe = new HudProbe();
+        static readonly KeyBindings Keys = new KeyBindings();
         const int PanelOrderAboveHud = 500;     // UiKit's own default: over every game canvas
         static int _panelOrder = PanelOrderAboveHud;
         static bool _behindWarned;
@@ -36,6 +37,9 @@ namespace RearViewCamera
         static Minimap _map;
         static RectTransform _mapRect;
         static Canvas _mapCanvas;
+
+        /// The keys really used this session (InGameTests).
+        internal static KeyBindings KeyUse { get { return Keys; } }
 
         /// What is shown now (InGameTests, diagnostics).
         internal static RearViewMode Shown { get { return _shown; } }
@@ -72,6 +76,7 @@ namespace RearViewCamera
                     ModLog.Verbose("Controller: key block " + _lastBlock + " -> " + block);
                     _lastBlock = block;
                 }
+                Keys.CheckIfNeeded();             // once per session + after the player changes a key (R12)
                 bool mapOpen = ScreenState.MapOpen();
                 string hiding = ScreenState.HidingScreen(Player.m_localPlayer);
                 string screen = hiding ?? (mapOpen ? "large map" : "");
@@ -84,9 +89,9 @@ namespace RearViewCamera
                 {
                     MapOpen = mapOpen,
                     ScreenHidden = hiding != null,
-                    SmallHeld = KeyHeld(ModSettings.SmallCameraKey.Value),
-                    SmallPressed = KeyPressed(ModSettings.SmallCameraKey.Value),
-                    FullHeld = KeyHeld(ModSettings.FullScreenKey.Value),
+                    SmallHeld = KeyHeld(Keys.SmallKey),
+                    SmallPressed = KeyPressed(Keys.SmallKey),
+                    FullHeld = KeyHeld(Keys.FullKey),
                     Blocked = block != BlockReason.None,
                     UiOpeningKey = RearViewInputBlocker.UiOpeningKeyPressed()
                 };

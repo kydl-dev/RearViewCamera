@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <!-- the game's post-processing stack (v1): the rear camera copies the game's colour grading (D-022) -->
+    <!-- the game's Input System bindings: key-conflict check (R12, D-035) -->
+    <Reference Include="Unity.InputSystem"><HintPath>$(ValheimRefs)\Unity.InputSystem.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="assembly_postprocessing"><HintPath>$(ValheimRefs)\assembly_postprocessing.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
 

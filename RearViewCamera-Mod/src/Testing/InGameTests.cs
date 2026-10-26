@@ -36,6 +36,16 @@ namespace RearViewCamera.Testing
             return "PASS: " + r;
         }
 
+        /// R12: which keys the rear view really uses this session (backup Home / End when the configured key is taken).
+        static string World_KeyBindings()
+        {
+            var k = RearViewController.KeyUse;
+            string detail = "small " + ModSettings.SmallCameraKey.Value + " -> " + k.SmallKey + " (" + k.SmallState + "), full " + ModSettings.FullScreenKey.Value
+                + " -> " + k.FullKey + " (" + k.FullState + ")";
+            if (k.SmallState == RearViewCamera.Logic.KeyState.Off || k.FullState == RearViewCamera.Logic.KeyState.Off) return "FAIL: a key and its backup are taken - " + detail;
+            return "PASS: " + detail;
+        }
+
         /// What is shown right now (manual test: press N / hold J, then PageDown to re-run).
         static string World_ShownMode()
         {
