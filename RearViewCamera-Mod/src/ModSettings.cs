@@ -43,11 +43,8 @@ namespace RearViewCamera
         // depth textures, culling are copied from the game camera (T-008, user: "settings only"), so they are no Tunables.
         public static readonly Tunable<float> SmallRenderScale = new Tunable<float>("Rendering", "SmallRenderScale", 1f, 0.25f, 1f,
             "Render-texture size of the small camera as a fraction of its on-screen size (1 = one rendered pixel per screen pixel).");
-        public static readonly Tunable<float> FullScreenRenderScale = new Tunable<float>("Rendering", "FullScreenRenderScale", 1f, 0.25f, 1f,   // user settled 1 in game (2026-10-26, D-024)
-
-            "Render-texture size of the full-screen view as a fraction of the screen resolution (lower = cheaper, blurrier).");
-        public static readonly Tunable<int> FullScreenMinHeight = new Tunable<int>("Rendering", "FullScreenMinHeight", FullScreenSize.DefaultMinHeight, 360, 2160,
-            "Lowest render height of the full-screen view, pixels (user: at least 1080p); never above the screen height.");
+        public static readonly Tunable<int> FullScreenMaxHeight = new Tunable<int>("Rendering", "FullScreenMaxHeight", FullScreenSize.DefaultMaxHeight, 360, 2160,
+            "Highest render height of the full-screen view, pixels (user: 1080p, upscaled to the display); never above the screen height.");
         public static readonly Tunable<float> LiftClearance = new Tunable<float>("Camera", "LiftClearance", 0.5f, 0f, 2f,
             "R7: how far above an animal's back the rear camera goes when the animal is between player and camera, metres.");
         public static readonly Tunable<float> LiftMax = new Tunable<float>("Camera", "LiftMax", 3f, 0.5f, 6f,
