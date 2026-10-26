@@ -48,6 +48,8 @@ namespace RearViewCamera
 
         static bool _disabledForSession;
         static bool _wasPaused;
+        static float _nextFakeError;
+        const float FakeErrorSeconds = 2f;
 
         /// Every frame (Plugin.Update), behind the safety net (D-028 / D-039). Expected outcome: returns the mode shown after this frame.
         internal static RearViewMode Tick()
@@ -66,6 +68,11 @@ namespace RearViewCamera
 
         static RearViewMode TickInner()
         {
+            if (ModSettings.FakeError.Value == 1 && _shown != RearViewMode.Off && Time.unscaledTime >= _nextFakeError)
+            {
+                _nextFakeError = Time.unscaledTime + FakeErrorSeconds;
+                throw new System.InvalidOperationException("FakeError test (KydlTools: RearViewCamera Debug.FakeError = 1) at quality " + Renderer.Quality);
+            }
             string offReason = OffReason();
             RearViewMode wanted = RearViewMode.Off;
             if (offReason == null)
