@@ -49,14 +49,17 @@ namespace RearViewCamera
         static bool _disabledForSession;
         static bool _wasPaused;
         static float _nextFakeError;
+        static RearViewNoticeView _notice;
+        static float _noticeUntil;
         const float FakeErrorSeconds = 2f;
 
         /// Every frame (Plugin.Update), behind the safety net (D-028 / D-039). Expected outcome: returns the mode shown after this frame.
         internal static RearViewMode Tick()
         {
-            if (_disabledForSession) return _shown;
             try
             {
+                TickNotice();
+                if (_disabledForSession) return _shown;
                 return TickInner();
             }
             catch (System.Exception e)   // last-resort net: any failure must not repeat every frame (R4)
@@ -64,6 +67,33 @@ namespace RearViewCamera
                 StepDown("Update", e);
                 return _shown;
             }
+        }
+
+        /// User 2026-10-26: a rear-view key that does nothing (switched off for the session, or key + backup taken) shows a note on the
+        /// left for NoticeSeconds; it hides itself afterwards. Only the player's own configured keys count, and only in a world.
+        static void TickNotice()
+        {
+            if (_notice != null && _noticeUntil > 0f && Time.unscaledTime >= _noticeUntil)
+            {
+                _notice.Hide();
+                _noticeUntil = 0f;
+            }
+            if (Player.m_localPlayer == null || !ModSettings.On) return;
+            KeyCode small = ModSettings.SmallCameraKey.Value, full = ModSettings.FullScreenKey.Value;
+            KeyCode pressed = KeyPressed(small) ? small : KeyPressed(full) ? full : KeyCode.None;
+            if (pressed == KeyCode.None) return;
+            string text = _disabledForSession ? Loc.T("rearviewcamera_notice_session_off") : Keys.NoticeFor(pressed);
+            if (text == null) return;
+            if (_notice == null || _notice.Element.panel == null)
+            {
+                var root = UiKit.Root;
+                if (root == null) return;
+                _notice = RearViewNoticeView.Build();
+                root.Add(_notice.Element);
+            }
+            _notice.Show(text);
+            _noticeUntil = Time.unscaledTime + ModSettings.NoticeSeconds.Value;
+            ModLog.Info("Controller: " + pressed + " pressed but does nothing - note shown for " + ModSettings.NoticeSeconds.Value + " s: " + text);
         }
 
         static RearViewMode TickInner()
@@ -133,6 +163,11 @@ namespace RearViewCamera
         /// lower level on the next frame; the player gets one line on screen per step.
         static void StepDown(string where, System.Exception e)
         {
+            if (_disabledForSession)
+            {
+                ModLog.Error("Controller: error in " + where + " after the rear view was switched off: " + e.Message);
+                return;
+            }
             ModLog.Error("Controller: error in " + where + " at quality " + Renderer.Quality + ": " + e);
             try { Show(RearViewMode.Off); }
             catch (System.Exception e2) { ModLog.Error("Controller: hiding after the error failed too: " + e2.Message); }

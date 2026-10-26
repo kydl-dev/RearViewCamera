@@ -61,6 +61,8 @@ namespace RearViewCamera
             "Distance of the small camera to the top / right screen edge when the minimap is hidden or not found, screen pixels.");
         public static readonly Tunable<float> BorderWidth = new Tunable<float>("Layout", "BorderWidth", 2f, 0f, 8f,
             "Gold-brown frame around the small camera, screen pixels (0 = no frame).");
+        public static readonly Tunable<float> NoticeSeconds = new Tunable<float>("Layout", "NoticeSeconds", 5f, 1f, 15f,
+            "How long the note on the left stays when a rear-view key does nothing (user: 5 s), seconds.");
         public static readonly Tunable<int> FakeError = new Tunable<int>("Debug", "FakeError", 0, 0, 1,
             "Test of the error safety net (R4): 1 = while the rear view is shown, throw a fake error every 2 s (each one steps down: no colour grading, plain camera, off for the session). Set back to 0 afterwards.");
         public static readonly Tunable<float> DiagnosticSeconds = new Tunable<float>("Debug", "DiagnosticSeconds", 3f, 1f, 30f,

@@ -21,6 +21,7 @@ namespace RearViewCamera.Game
         const KeyCode FullBackup = KeyCode.End;
 
         string _checkedFor;
+        Dictionary<KeyCode, string> _owners = new Dictionary<KeyCode, string>();
 
         internal KeyCode SmallKey { get; private set; } = KeyCode.None;
         internal KeyCode FullKey { get; private set; } = KeyCode.None;
@@ -35,6 +36,7 @@ namespace RearViewCamera.Game
             if (sig == _checkedFor) return sig != _checkedFor;
             _checkedFor = sig;
             Dictionary<KeyCode, string> owners = Collect(new[] { small, full, SmallBackup, FullBackup });
+            _owners = owners;
 
             SmallState = KeyConflict.Resolve((int)small, (int)SmallBackup, k => owners.ContainsKey((KeyCode)k) || (k != 0 && k == (int)full), out int s);
             SmallKey = (KeyCode)s;
@@ -43,8 +45,8 @@ namespace RearViewCamera.Game
 
             ModLog.Info("KeyBindings: small camera " + small + " -> " + SmallKey + " (" + SmallState + "), full screen " + full + " -> " + FullKey + " (" + FullState + ")"
                 + "; checked against " + owners.Count + " taken key(s) of interest");
-            Tell("SmallCameraKey", small, SmallBackup, SmallState, Owner(owners, small, full));
-            Tell("FullScreenKey", full, FullBackup, FullState, Owner(owners, full, SmallKey));
+            Tell("SmallCameraKey", small, SmallBackup, SmallState, Owner(owners, small, full), Owner(owners, SmallBackup, full));
+            Tell("FullScreenKey", full, FullBackup, FullState, Owner(owners, full, SmallKey), Owner(owners, FullBackup, SmallKey));
             return sig == _checkedFor;
         }
 
@@ -54,13 +56,24 @@ namespace RearViewCamera.Game
             return key == ourOther ? "RearViewCamera's other key" : "?";
         }
 
-        static void Tell(string entry, KeyCode configured, KeyCode backup, KeyState state, string owner)
+        /// The configured key is pressed but does nothing this session (state Off). Expected outcome: the note text, or null when the key works.
+        internal string NoticeFor(KeyCode pressed)
+        {
+            KeyCode small = ModSettings.SmallCameraKey.Value, full = ModSettings.FullScreenKey.Value;
+            if (pressed == small && SmallState == KeyState.Off)
+                return Loc.T("rearviewcamera_notice_key_off", small.ToString(), Owner(_owners, small, full), SmallBackup.ToString(), Owner(_owners, SmallBackup, full), "SmallCameraKey");
+            if (pressed == full && FullState == KeyState.Off)
+                return Loc.T("rearviewcamera_notice_key_off", full.ToString(), Owner(_owners, full, SmallKey), FullBackup.ToString(), Owner(_owners, FullBackup, SmallKey), "FullScreenKey");
+            return null;
+        }
+
+        static void Tell(string entry, KeyCode configured, KeyCode backup, KeyState state, string owner, string backupOwner)
         {
             string msg = null;
             if (state == KeyState.Backup)
                 msg = Loc.T("rearviewcamera_msg_key_backup", configured.ToString(), owner, backup.ToString(), entry);
             else if (state == KeyState.Off)
-                msg = Loc.T("rearviewcamera_msg_key_off", configured.ToString(), owner, backup.ToString(), entry);
+                msg = Loc.T("rearviewcamera_msg_key_off", configured.ToString(), owner, backup.ToString(), backupOwner, entry);
             if (msg == null) return;
             ModLog.Warn("KeyBindings: " + msg);
             if (MessageHud.instance != null) MessageHud.instance.ShowMessage(MessageHud.MessageType.Center, msg);
