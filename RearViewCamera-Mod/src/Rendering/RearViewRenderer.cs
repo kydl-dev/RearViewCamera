@@ -206,6 +206,7 @@ namespace RearViewCamera.Rendering
             Vector3 position = eye - look * ModSettings.CameraDistance.Value + Vector3.up * ModSettings.CameraHeight.Value;
 
             ApplyCameraSettings();
+            if (_quality == RenderQuality.Full) _grading.Refresh(GameCameraNow());
             _camera.transform.SetPositionAndRotation(position, Quaternion.LookRotation(-look, Vector3.up));
             _camera.Render();
             _renders++;
