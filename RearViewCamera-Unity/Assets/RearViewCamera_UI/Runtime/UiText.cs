@@ -10,7 +10,9 @@ namespace RearViewCamera.Ui
     {
         internal static readonly Dictionary<string, string> En = new Dictionary<string, string>
         {
-            // no player-facing text yet: the rear view has no menu (D-018) and no warning box (D-012)
+            // the rear view has no menu (D-018) and no warning box (D-012); these are one-line game messages
+            { "rearviewcamera_msg_stepdown", "Rear view: an error happened, now running with {0}." },
+            { "rearviewcamera_msg_off", "Rear view: switched off for this session after repeated errors (see the BepInEx log)." },
         };
 
 

@@ -42,8 +42,25 @@ namespace RearViewCamera
         /// The last small-window rectangle in screen pixels.
         internal static HudRect LastRect { get { return _lastRect; } }
 
-        /// Every frame (Plugin.Update). Expected outcome: returns the mode shown after this frame.
+        static bool _disabledForSession;
+        static bool _wasPaused;
+
+        /// Every frame (Plugin.Update), behind the safety net (D-028 / D-039). Expected outcome: returns the mode shown after this frame.
         internal static RearViewMode Tick()
+        {
+            if (_disabledForSession) return _shown;
+            try
+            {
+                return TickInner();
+            }
+            catch (System.Exception e)   // last-resort net: any failure must not repeat every frame (R4)
+            {
+                StepDown("Update", e);
+                return _shown;
+            }
+        }
+
+        static RearViewMode TickInner()
         {
             string offReason = OffReason();
             RearViewMode wanted = RearViewMode.Off;
@@ -85,10 +102,45 @@ namespace RearViewCamera
             return _shown;
         }
 
-        /// Every frame after Update (Plugin.LateUpdate). Expected outcome: returns whether a frame was rendered now.
+        /// Every frame after Update (Plugin.LateUpdate), behind the safety net. Expected outcome: returns whether a frame was rendered now.
         internal static bool LateTick()
         {
-            if (_shown == RearViewMode.Off) return _shown != RearViewMode.Off;
+            if (_disabledForSession) return !_disabledForSession;
+            try
+            {
+                return LateTickInner();
+            }
+            catch (System.Exception e)   // last-resort net, see Tick
+            {
+                StepDown("LateUpdate", e);
+                return _disabledForSession;
+            }
+        }
+
+        /// One error = one step down (D-039): Full -> NoGrading -> Plain -> off for this session. The view is hidden and rebuilt at the
+        /// lower level on the next frame; the player gets one line on screen per step.
+        static void StepDown(string where, System.Exception e)
+        {
+            ModLog.Error("Controller: error in " + where + " at quality " + Renderer.Quality + ": " + e);
+            try { Show(RearViewMode.Off); }
+            catch (System.Exception e2) { ModLog.Error("Controller: hiding after the error failed too: " + e2.Message); }
+            string message;
+            if (Renderer.Quality == RenderQuality.Full) { Renderer.Quality = RenderQuality.NoGrading; message = Loc.T("rearviewcamera_msg_stepdown", "no colour grading"); }
+            else if (Renderer.Quality == RenderQuality.NoGrading) { Renderer.Quality = RenderQuality.Plain; message = Loc.T("rearviewcamera_msg_stepdown", "a plain camera"); }
+            else { _disabledForSession = true; message = Loc.T("rearviewcamera_msg_off"); ModLog.Error("Controller: rear view switched off for this session (errors at every quality level)"); }
+            if (MessageHud.instance != null) MessageHud.instance.ShowMessage(MessageHud.MessageType.TopLeft, message);
+        }
+
+        static bool LateTickInner()
+        {
+            if (_shown == RearViewMode.Off) return _shown != RearViewMode.Off;      // never render what nobody sees (D-029)
+            bool paused = ScreenState.Paused();
+            if (paused != _wasPaused)
+            {
+                ModLog.Verbose("Controller: game " + (paused ? "paused - keeping the last frame, no new renders" : "unpaused - rendering again"));
+                _wasPaused = paused;
+            }
+            if (paused) return !paused;
             bool rendered = Renderer.RenderIfDue();
             if (Time.unscaledTime >= _nextDiagnostic)
             {

@@ -8,6 +8,17 @@ namespace RearViewCamera.Rendering
     /// exist only while the rear view is shown and are destroyed (not just disabled) as soon as it is hidden. The camera is never enabled:
     /// it renders by hand at the configured rate, so it costs nothing between frames and never touches the game's camera stack.
     /// </summary>
+    /// <summary>How much of the game camera the rear camera copies; lowered step by step after errors (D-039).</summary>
+    internal enum RenderQuality
+    {
+        /// Game camera settings + the game's colour grading.
+        Full,
+        /// Game camera settings, no colour grading.
+        NoGrading,
+        /// A plain Unity camera (only FOV, distance and height from the config).
+        Plain
+    }
+
     internal sealed class RearViewRenderer
     {
         const int DepthBits = 16;
@@ -24,6 +35,21 @@ namespace RearViewCamera.Rendering
         bool _creationFailureLogged;
         int _renders;
         int _sameSizeRebuilds;
+
+        RenderQuality _quality = RenderQuality.Full;
+
+        /// Lowering it frees the camera, so the next frame rebuilds it at the new level.
+        internal RenderQuality Quality
+        {
+            get { return _quality; }
+            set
+            {
+                if (value == _quality) return;
+                ModLog.Warn("Renderer: quality " + _quality + " -> " + value);
+                _quality = value;
+                Release();
+            }
+        }
 
         internal RenderTexture Texture { get { return _texture; } }
         internal bool IsCreated { get { return _camera != null && _texture != null; } }
@@ -66,7 +92,7 @@ namespace RearViewCamera.Rendering
             _camera.depth = -100f;
             ApplyCameraSettings();
             CameraDiagnostics.WriteOnce(_camera);    // T-008: game camera vs rear camera, once per session
-            _grading.Attach(_camera, GameCameraNow()); // D-022: the game's colour grading only
+            if (_quality == RenderQuality.Full) _grading.Attach(_camera, GameCameraNow()); // D-022: the game's colour grading only
             ModLog.Verbose("Renderer: camera made (near " + _camera.nearClipPlane + " m, far " + _camera.farClipPlane + " m, FOV " + _camera.fieldOfView + " deg, culling mask 0x" + _camera.cullingMask.ToString("X8") + ")");
         }
 
@@ -102,7 +128,7 @@ namespace RearViewCamera.Rendering
         /// every frame (T-G003, session 20261025-051552).
         RenderTextureFormat WantedFormat()
         {
-            Camera game = GameCameraNow();
+            Camera game = _quality == RenderQuality.Plain ? null : GameCameraNow();
             bool hdr = game != null && game.allowHDR && SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.ARGBHalf);
             return hdr ? RenderTextureFormat.ARGBHalf : RenderTextureFormat.ARGB32;
         }
@@ -127,7 +153,7 @@ namespace RearViewCamera.Rendering
         void ApplyCameraSettings()
         {
             _camera.fieldOfView = ModSettings.FieldOfView.Value;
-            Camera game = GameCameraNow();
+            Camera game = _quality == RenderQuality.Plain ? null : GameCameraNow();
             if (game == null) return;
             _camera.renderingPath = game.renderingPath;
             _camera.allowHDR = game.allowHDR;
