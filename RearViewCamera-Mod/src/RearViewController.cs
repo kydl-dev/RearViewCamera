@@ -153,7 +153,7 @@ namespace RearViewCamera
                 var t = Renderer.Texture;
                 ModLog.Verbose("Controller: " + _shown + ", texture " + (t != null ? t.width + "x" + t.height : "none") + ", " + Renderer.Renders + " render(s), "
                     + (_shown == RearViewMode.Small ? "window " + _lastRect + ", " : "") + "screen " + Screen.width + "x" + Screen.height
-                    + ", toggle " + (Logic.ToggleOn ? "on" : "off") + ", block " + _lastBlock);
+                    + ", toggle " + (Logic.ToggleOn ? "on" : "off") + ", block " + _lastBlock + ", animal lift " + Renderer.Lift.ToString("F2") + " m");
             }
             return rendered;
         }
@@ -239,6 +239,8 @@ namespace RearViewCamera
 
         static HudRect PlaceSmall()
         {
+            // D-026 / T-G006: the large map hides the minimap; keep the window where it was instead of jumping to the corner fallback
+            if (ScreenState.MapOpen() && _lastRect.UnderMinimap) return _lastRect;
             bool found = TryMinimapEdges(out float right, out float bottom);
             StatusIconPlacement placement = ModSettings.StatusEffects.Value;
             bool icons = Probe.TryStatusIcons(out HudRect iconRect);

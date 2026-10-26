@@ -16,7 +16,7 @@ namespace RearViewCamera.Rendering
 
         float _lift;
         float _lastTime = -1f;
-        string _lastBlocker = "";
+        int _lastBlocker;   // instance id, 0 = none: log only when the animal changes (T-G006: the old text with heights logged every render)
 
         /// Metres the camera is lifted right now (diagnostics).
         internal float Lift { get { return _lift; } }
@@ -30,14 +30,15 @@ namespace RearViewCamera.Rendering
                 ModLog.Verbose("AnimalLift: character layer mask 0x" + _mask.ToString("X8"));
             }
             Character blocker = FindBlocker(player, eye, position, out float top);
-            string name = blocker != null ? blocker.m_name + " (top " + top.ToString("F2") + " m, eye " + eye.y.ToString("F2") + " m)" : "";
             float target = 0f;
             if (blocker != null)
                 OccluderLift.For(eye.y, top, ModSettings.LiftClearance.Value, ModSettings.LiftMax.Value, ModSettings.LiftLookAhead.Value, out target, out _);
-            if (name != _lastBlocker)
+            int id = blocker != null ? blocker.GetInstanceID() : 0;
+            if (id != _lastBlocker)
             {
-                ModLog.Verbose("AnimalLift: " + (blocker != null ? "animal in the way: " + name + ", lift to " + target.ToString("F2") + " m" : "no animal in the way, lift back to 0"));
-                _lastBlocker = name;
+                ModLog.Verbose("AnimalLift: " + (blocker != null ? "animal in the way: " + blocker.m_name + " (top " + top.ToString("F2") + " m, eye " + eye.y.ToString("F2")
+                    + " m), lift to " + target.ToString("F2") + " m" : "no animal in the way, lift back to 0"));
+                _lastBlocker = id;
             }
             float now = Time.unscaledTime;
             float dt = _lastTime < 0f ? 1f : now - _lastTime;
@@ -55,7 +56,7 @@ namespace RearViewCamera.Rendering
         {
             _lift = 0f;
             _lastTime = -1f;
-            _lastBlocker = "";
+            _lastBlocker = 0;
         }
 
         Character FindBlocker(Player player, Vector3 eye, Vector3 camera, out float top)

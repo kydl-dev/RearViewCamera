@@ -11,12 +11,14 @@ namespace RearViewCamera.Game
     internal sealed class HudProbe
     {
         static readonly Vector3[] Corners = new Vector3[4];
+        static readonly System.Collections.Generic.List<UnityEngine.UI.Graphic> Graphics = new System.Collections.Generic.List<UnityEngine.UI.Graphic>();
 
         Hud _hud;
         RectTransform _iconRoot;
         Canvas _canvas;
 
-        /// Screen rectangle (pixels, top-left origin) around every visible status-effect icon. Expected outcome: whether any is visible.
+        /// Screen rectangle (pixels, top-left origin) around everything drawn for the visible status effects: the icon, its name above
+        /// and its timer below (T-G006: measuring only the icon let the window cover the timer). Expected outcome: whether any is visible.
         internal bool TryStatusIcons(out HudRect rect)
         {
             rect = default(HudRect);
@@ -28,12 +30,17 @@ namespace RearViewCamera.Game
             {
                 var child = _iconRoot.GetChild(i) as RectTransform;
                 if (child == null || !child.gameObject.activeInHierarchy) continue;
-                child.GetWorldCorners(Corners);                     // 0 bottom-left, 1 top-left, 2 top-right, 3 bottom-right
-                Vector2 tl = RectTransformUtility.WorldToScreenPoint(cam, Corners[1]);
-                Vector2 br = RectTransformUtility.WorldToScreenPoint(cam, Corners[3]);
-                minX = Mathf.Min(minX, tl.x); maxX = Mathf.Max(maxX, br.x);
-                minY = Mathf.Min(minY, Screen.height - tl.y); maxY = Mathf.Max(maxY, Screen.height - br.y);
-                count++;
+                child.GetComponentsInChildren(false, Graphics);    // icon image, name text, timer text (reused list: no allocation)
+                foreach (UnityEngine.UI.Graphic g in Graphics)
+                {
+                    if (!g.enabled || g.color.a <= 0.01f) continue;
+                    g.rectTransform.GetWorldCorners(Corners);       // 0 bottom-left, 1 top-left, 2 top-right, 3 bottom-right
+                    Vector2 tl = RectTransformUtility.WorldToScreenPoint(cam, Corners[1]);
+                    Vector2 br = RectTransformUtility.WorldToScreenPoint(cam, Corners[3]);
+                    minX = Mathf.Min(minX, tl.x); maxX = Mathf.Max(maxX, br.x);
+                    minY = Mathf.Min(minY, Screen.height - tl.y); maxY = Mathf.Max(maxY, Screen.height - br.y);
+                    count++;
+                }
             }
             if (count == 0) return count > 0;
             rect = new HudRect { X = minX, Y = minY, Width = maxX - minX, Height = maxY - minY };

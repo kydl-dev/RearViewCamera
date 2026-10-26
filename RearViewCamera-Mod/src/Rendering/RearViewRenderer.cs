@@ -53,6 +53,8 @@ namespace RearViewCamera.Rendering
         }
 
         internal RenderTexture Texture { get { return _texture; } }
+        /// Metres the camera is lifted over an animal right now (diagnostics).
+        internal float Lift { get { return _lift.Lift; } }
         internal bool IsCreated { get { return _camera != null && _texture != null; } }
         /// Renders since the resources were created (diagnostic line).
         internal int Renders { get { return _renders; } }
