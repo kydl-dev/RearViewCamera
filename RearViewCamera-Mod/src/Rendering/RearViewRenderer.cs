@@ -27,6 +27,7 @@ namespace RearViewCamera.Rendering
         Camera _camera;
         RenderTexture _texture;
         readonly RearColorGrading _grading = new RearColorGrading();
+        readonly AnimalLift _lift = new AnimalLift();
         GameCamera _gameCameraOwner;
         Camera _gameCamera;
         string _copiedFrom = "";
@@ -204,10 +205,12 @@ namespace RearViewCamera.Rendering
             look.Normalize();
             Vector3 eye = player.GetEyePoint();
             Vector3 position = eye - look * ModSettings.CameraDistance.Value + Vector3.up * ModSettings.CameraHeight.Value;
+            Quaternion rotation = Quaternion.LookRotation(-look, Vector3.up);
+            _lift.Apply(player, eye, look, ref position, ref rotation);     // R7: over an animal that is in the way
 
             ApplyCameraSettings();
             if (_quality == RenderQuality.Full) _grading.Refresh(GameCameraNow());
-            _camera.transform.SetPositionAndRotation(position, Quaternion.LookRotation(-look, Vector3.up));
+            _camera.transform.SetPositionAndRotation(position, rotation);
             _camera.Render();
             _renders++;
             if (_renders == 1)
@@ -222,6 +225,7 @@ namespace RearViewCamera.Rendering
             if (_camera == null && _texture == null) return !IsCreated;
             ReleaseTexture();
             _grading.Detach();
+            _lift.Reset();
             if (_camera != null)
             {
                 Object.Destroy(_camera.gameObject);

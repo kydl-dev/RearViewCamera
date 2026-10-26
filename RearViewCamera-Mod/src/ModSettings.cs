@@ -48,6 +48,16 @@ namespace RearViewCamera
             "Render-texture size of the full-screen view as a fraction of the screen resolution (lower = cheaper, blurrier).");
         public static readonly Tunable<int> FullScreenMinHeight = new Tunable<int>("Rendering", "FullScreenMinHeight", FullScreenSize.DefaultMinHeight, 360, 2160,
             "Lowest render height of the full-screen view, pixels (user: at least 1080p); never above the screen height.");
+        public static readonly Tunable<float> LiftClearance = new Tunable<float>("Camera", "LiftClearance", 0.5f, 0f, 2f,
+            "R7: how far above an animal's back the rear camera goes when the animal is between player and camera, metres.");
+        public static readonly Tunable<float> LiftMax = new Tunable<float>("Camera", "LiftMax", 3f, 0.5f, 6f,
+            "R7: highest the rear camera is lifted over an animal, metres.");
+        public static readonly Tunable<float> LiftLookAhead = new Tunable<float>("Camera", "LiftLookAhead", 8f, 2f, 30f,
+            "R7: the lifted camera tilts down to aim at eye height this far behind the player, metres.");
+        public static readonly Tunable<float> LiftSpeed = new Tunable<float>("Camera", "LiftSpeed", 4f, 0.5f, 20f,
+            "R7: how fast the camera moves up / down when an animal comes or goes, metres per second.");
+        public static readonly Tunable<float> LiftProbeRadius = new Tunable<float>("Camera", "LiftProbeRadius", 0.3f, 0.05f, 1f,
+            "R7: radius of the check for animals between the eyes and the camera, metres.");
         public static readonly Tunable<float> MinimapGap = new Tunable<float>("Layout", "MinimapGap", 10f, 0f, 60f,
             "Space between the bottom of the minimap and the small camera, screen pixels.");
         public static readonly Tunable<float> ScreenMargin = new Tunable<float>("Layout", "ScreenMargin", 20f, 0f, 100f,
