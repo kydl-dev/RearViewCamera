@@ -9,6 +9,10 @@ namespace RearViewCamera.Logic
     ///  * After a block, input is accepted again only once both keys are released - a key held while closing chat must not
     ///    switch anything.
     ///  * Switching the config between Toggle and Hold resets the toggle to off, so a stale toggle never shows up unasked.
+    ///  * Large map open (D-026): a shown small camera stays (toggle on / key held); its key can only hide it; nothing new is shown and
+    ///    the full-screen view never opens.
+    ///  * Inventory / menu / loading screen open (D-036): nothing is shown, presses are ignored, the toggle is kept, so the same view
+    ///    returns when the screen closes.
     /// Logs every state change through the sink it gets (the controller passes ModLog.Verbose).
     /// </summary>
     internal sealed class RearViewKeyLogic
@@ -49,6 +53,11 @@ namespace RearViewCamera.Logic
                 next = KeptMode();
                 why = "waiting until both keys are released after a block";
             }
+            else if (keys.ScreenHidden)
+            {
+                next = RearViewMode.Off;
+                why = "inventory / menu / loading screen open (state kept: toggle " + OnOff(_toggleOn) + ")";
+            }
             else
             {
                 if (_suppressed)
@@ -56,7 +65,7 @@ namespace RearViewCamera.Logic
                     _suppressed = false;
                     _log("RearViewKeyLogic: keys released after a block, input accepted again");
                 }
-                next = Decide(keys, out why);
+                next = keys.MapOpen ? DecideOnMap(keys, out why) : Decide(keys, out why);
             }
             if (next != _current)
             {
@@ -78,6 +87,38 @@ namespace RearViewCamera.Logic
             if (_mode == SmallCameraMode.Hold && keys.SmallHeld) { why = "small-camera key held (Hold mode)"; return RearViewMode.Small; }
             if (_mode == SmallCameraMode.Toggle && _toggleOn) { why = "toggle on"; return RearViewMode.Small; }
             why = _mode == SmallCameraMode.Toggle ? "toggle off, full-screen key not held" : "no key held";
+            return RearViewMode.Off;
+        }
+
+        /// Large map open: only what is already shown as the small camera may stay; the key can only hide it. Expected outcome: Off or Small.
+        RearViewMode DecideOnMap(RearViewKeys keys, out string why)
+        {
+            bool wasSmall = _current == RearViewMode.Small;
+            if (_mode == SmallCameraMode.Toggle && keys.SmallPressed)
+            {
+                if (_toggleOn)
+                {
+                    _toggleOn = false;
+                    _log("RearViewKeyLogic: small-camera key pressed on the large map, toggle now off");
+                }
+                else
+                {
+                    _log("RearViewKeyLogic: small-camera key pressed on the large map while off - ignored (the map may only hide it)");
+                }
+            }
+            if (keys.FullHeld && _current != RearViewMode.FullScreen)
+                _log("RearViewKeyLogic: full-screen key held on the large map - ignored");
+            if (_mode == SmallCameraMode.Toggle && _toggleOn && (wasSmall || _current == RearViewMode.FullScreen))
+            {
+                why = "large map open, small camera was shown and stays";
+                return RearViewMode.Small;
+            }
+            if (_mode == SmallCameraMode.Hold && keys.SmallHeld && wasSmall)
+            {
+                why = "large map open, small-camera key still held";
+                return RearViewMode.Small;
+            }
+            why = "large map open, nothing new is shown";
             return RearViewMode.Off;
         }
 

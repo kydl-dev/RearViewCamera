@@ -26,6 +26,7 @@ namespace RearViewCamera
         static BlockReason _lastBlock = BlockReason.None;
         static HudRect _lastRect;
         static string _lastOffReason = "";
+        static string _lastScreen = "";
         static float _nextDiagnostic;
 
         static Minimap _map;
@@ -50,8 +51,18 @@ namespace RearViewCamera
                     ModLog.Verbose("Controller: key block " + _lastBlock + " -> " + block);
                     _lastBlock = block;
                 }
+                bool mapOpen = ScreenState.MapOpen();
+                string hiding = ScreenState.HidingScreen(Player.m_localPlayer);
+                string screen = hiding ?? (mapOpen ? "large map" : "");
+                if (screen != _lastScreen)
+                {
+                    ModLog.Verbose("Controller: screen '" + _lastScreen + "' -> '" + screen + "'" + (hiding != null ? " (rear view hidden, state kept)" : mapOpen ? " (map: may only hide)" : ""));
+                    _lastScreen = screen;
+                }
                 var keys = new RearViewKeys
                 {
+                    MapOpen = mapOpen,
+                    ScreenHidden = hiding != null,
                     SmallHeld = KeyHeld(ModSettings.SmallCameraKey.Value),
                     SmallPressed = KeyPressed(ModSettings.SmallCameraKey.Value),
                     FullHeld = KeyHeld(ModSettings.FullScreenKey.Value),

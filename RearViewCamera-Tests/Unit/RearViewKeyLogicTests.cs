@@ -17,9 +17,11 @@ namespace RearViewCamera.Tests.Unit
             _logic = new RearViewKeyLogic(_log.Add);
         }
 
-        static RearViewKeys Keys(bool smallHeld = false, bool smallPressed = false, bool fullHeld = false, bool blocked = false, bool uiKey = false)
+        static RearViewKeys Keys(bool smallHeld = false, bool smallPressed = false, bool fullHeld = false, bool blocked = false, bool uiKey = false,
+            bool map = false, bool hidden = false)
         {
-            return new RearViewKeys { SmallHeld = smallHeld, SmallPressed = smallPressed, FullHeld = fullHeld, Blocked = blocked, UiOpeningKey = uiKey };
+            return new RearViewKeys { SmallHeld = smallHeld, SmallPressed = smallPressed, FullHeld = fullHeld, Blocked = blocked, UiOpeningKey = uiKey,
+                MapOpen = map, ScreenHidden = hidden };
         }
 
         RearViewMode Toggle(RearViewKeys k) { return _logic.Step(k, SmallCameraMode.Toggle); }
@@ -112,6 +114,68 @@ namespace RearViewCamera.Tests.Unit
             PressAndRelease();
             Toggle(Keys(fullHeld: true));
             Assert.That(_log.FindAll(l => l.Contains(" -> ")).Count, Is.GreaterThanOrEqualTo(2));
+        }
+
+        // --- D-026 large map ------------------------------------------------------------------------------------------------------
+        [Test]
+        public void Map_ShownSmallStays_KeyHidesIt_CannotReopen()
+        {
+            PressAndRelease();
+            Assert.That(Toggle(Keys(map: true)), Is.EqualTo(RearViewMode.Small));
+            Assert.That(Toggle(Keys(smallHeld: true, smallPressed: true, map: true)), Is.EqualTo(RearViewMode.Off));
+            Toggle(Keys(map: true));
+            Assert.That(Toggle(Keys(smallHeld: true, smallPressed: true, map: true)), Is.EqualTo(RearViewMode.Off), "the map may only hide it");
+            Assert.That(_logic.ToggleOn, Is.False);
+        }
+
+        [Test]
+        public void Map_OffStaysOff_NoFullScreen()
+        {
+            Assert.That(Toggle(Keys(fullHeld: true, map: true)), Is.EqualTo(RearViewMode.Off));
+            Assert.That(Toggle(Keys(smallHeld: true, smallPressed: true, map: true)), Is.EqualTo(RearViewMode.Off));
+        }
+
+        [Test]
+        public void Map_OpenedDuringFullScreen_FallsBackToSmallIfToggleOn()
+        {
+            PressAndRelease();
+            Assert.That(Toggle(Keys(fullHeld: true)), Is.EqualTo(RearViewMode.FullScreen));
+            Assert.That(Toggle(Keys(fullHeld: true, map: true)), Is.EqualTo(RearViewMode.Small));
+        }
+
+        [Test]
+        public void Map_HoldMode_StaysWhileHeld_NoNewActivation()
+        {
+            Assert.That(Hold(Keys(smallHeld: true, smallPressed: true)), Is.EqualTo(RearViewMode.Small));
+            Assert.That(Hold(Keys(smallHeld: true, map: true)), Is.EqualTo(RearViewMode.Small));
+            Assert.That(Hold(Keys(map: true)), Is.EqualTo(RearViewMode.Off));
+            Assert.That(Hold(Keys(smallHeld: true, smallPressed: true, map: true)), Is.EqualTo(RearViewMode.Off));
+        }
+
+        // --- D-036 inventory / menu / loading: hide, then restore -----------------------------------------------------------------
+        [Test]
+        public void HiddenScreen_HidesAndRestores()
+        {
+            PressAndRelease();
+            Assert.That(Toggle(Keys(hidden: true)), Is.EqualTo(RearViewMode.Off));
+            Assert.That(_logic.ToggleOn, Is.True, "state kept");
+            Assert.That(Toggle(Keys()), Is.EqualTo(RearViewMode.Small), "restored");
+        }
+
+        [Test]
+        public void HiddenScreen_PressesIgnored()
+        {
+            Assert.That(Toggle(Keys(smallHeld: true, smallPressed: true, hidden: true)), Is.EqualTo(RearViewMode.Off));
+            Assert.That(_logic.ToggleOn, Is.False);
+            Assert.That(Toggle(Keys(fullHeld: true, hidden: true)), Is.EqualTo(RearViewMode.Off));
+        }
+
+        [Test]
+        public void HiddenScreen_HoldStillHeldAfterClose_ShowsAgain()
+        {
+            Assert.That(Hold(Keys(smallHeld: true, smallPressed: true)), Is.EqualTo(RearViewMode.Small));
+            Assert.That(Hold(Keys(smallHeld: true, hidden: true)), Is.EqualTo(RearViewMode.Off));
+            Assert.That(Hold(Keys(smallHeld: true)), Is.EqualTo(RearViewMode.Small));
         }
     }
 }
