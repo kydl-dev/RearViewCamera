@@ -114,7 +114,6 @@ namespace RearViewCamera
             ConfigTools.DropRemoved(c);
 
             EnableAll.SettingChanged += (s, e) => ModLog.Info("Config: EnableAll = " + EnableAll.Value + (EnableAll.Value ? ", the mod is on" : ", the mod is inert (no rear view)"));
-            SmallCameraKeyMode.SettingChanged += (s, e) => ModLog.Verbose("Config: SmallCameraKeyMode = " + SmallCameraKeyMode.Value);
             ModLog.Verbose("Config: bound (EnableAll " + EnableAll.Value + ", small key " + SmallCameraKey.Value + " " + SmallCameraKeyMode.Value
                 + ", full-screen key " + FullScreenKey.Value + ", height " + SmallHeight.Value + " px, offset " + SmallOffsetX.Value + "/" + SmallOffsetY.Value
                 + " px, distance " + CameraDistance.Value + " m, height offset " + CameraHeight.Value + " m, FOV " + FieldOfView.Value + " deg, "

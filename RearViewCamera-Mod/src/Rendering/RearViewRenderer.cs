@@ -36,6 +36,7 @@ namespace RearViewCamera.Rendering
         bool _creationFailureLogged;
         int _renders;
         int _sameSizeRebuilds;
+        string _applied = "";     // camera values from the player config last used for a render (logged when they change: proof of live config)
 
         RenderQuality _quality = RenderQuality.Full;
 
@@ -212,6 +213,13 @@ namespace RearViewCamera.Rendering
 
             ApplyCameraSettings();
             if (_quality == RenderQuality.Full) _grading.Refresh(GameCameraNow());
+            string applied = "FOV " + _camera.fieldOfView + " deg, " + ModSettings.CameraDistance.Value + " m behind, " + ModSettings.CameraHeight.Value + " m up, "
+                + ModSettings.UpdateFps.Value + " fps";
+            if (applied != _applied)
+            {
+                if (_applied.Length > 0) ModLog.Info("Renderer: now rendering with " + applied + " (was " + _applied + ")");
+                _applied = applied;
+            }
             _camera.transform.SetPositionAndRotation(position, rotation);
             _camera.Render();
             _renders++;
