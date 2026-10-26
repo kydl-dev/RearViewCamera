@@ -25,6 +25,7 @@ namespace RearViewCamera
         public static ConfigEntry<int> SmallHeight;
         public static ConfigEntry<int> SmallOffsetX;
         public static ConfigEntry<int> SmallOffsetY;
+        public static ConfigEntry<StatusIconPlacement> StatusEffects;
         // [Camera]
         public static ConfigEntry<float> CameraDistance;
         public static ConfigEntry<float> CameraHeight;
@@ -81,6 +82,9 @@ namespace RearViewCamera
                 "Moves the small camera up or down from its place under the minimap, screen pixels (negative = up, positive = down). It always stays on screen.",
                 new AcceptableValueRange<int>(-1000, 1000)));
 
+            StatusEffects = c.Bind("SmallCamera", "StatusEffects", StatusIconPlacement.Under,
+                "How the small camera treats the status-effect icons under the minimap. Under: it moves down below the icons that are showing. "
+                + "Behind: it stays in place and the icons are drawn over the camera picture. OnTop: it stays in place and covers the icons.");
             CameraDistance = c.Bind("Camera", "DistanceBehind", 0.65f, new ConfigDescription(
                 "How far behind your eyes the rear camera sits, metres.", new AcceptableValueRange<float>(0.05f, 3f)));
             CameraHeight = c.Bind("Camera", "HeightOffset", 0f, new ConfigDescription(
@@ -105,7 +109,7 @@ namespace RearViewCamera
                 + " px, distance " + CameraDistance.Value + " m, height offset " + CameraHeight.Value + " m, FOV " + FieldOfView.Value + " deg, "
                 + UpdateFps.Value + " fps, mirror " + MirrorImage.Value + ", debug log " + DebugLog.Value + ")");
             return EnableAll != null && SmallCameraKey != null && SmallCameraKeyMode != null && FullScreenKey != null && SmallHeight != null
-                && SmallOffsetX != null && SmallOffsetY != null && CameraDistance != null && CameraHeight != null && FieldOfView != null
+                && SmallOffsetX != null && SmallOffsetY != null && StatusEffects != null && CameraDistance != null && CameraHeight != null && FieldOfView != null
                 && UpdateFps != null && MirrorImage != null && DebugLog != null;
         }
     }

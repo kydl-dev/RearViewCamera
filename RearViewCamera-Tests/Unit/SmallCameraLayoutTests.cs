@@ -69,5 +69,51 @@ namespace RearViewCamera.Tests.Unit
             Assert.That(r.X, Is.EqualTo(0f));
             Assert.That(r.Y, Is.EqualTo(0f));
         }
+
+        // --- D-027 status-effect icons --------------------------------------------------------------------------------------------
+        static readonly HudRect Icons = new HudRect { X = 1700f, Y = 300f, Width = 200f, Height = 60f };   // under the minimap, right-aligned
+
+        [Test]
+        public void Under_MovesBelowIcons()
+        {
+            HudRect r = SmallCameraLayout.Place(1920, 1080, 450, 1900f, 290f, 10f, 20f, 0f, 0f, Icons, StatusIconPlacement.Under);
+            Assert.That(r.UnderIcons, Is.True);
+            Assert.That(r.Y, Is.EqualTo(370f), "icons bottom 360 + gap 10");
+        }
+
+        [Test]
+        public void Under_NoIcons_StaysUnderMinimap()
+        {
+            HudRect r = SmallCameraLayout.Place(1920, 1080, 450, 1900f, 290f, 10f, 20f, 0f, 0f, null, StatusIconPlacement.Under);
+            Assert.That(r.UnderIcons, Is.False);
+            Assert.That(r.Y, Is.EqualTo(300f));
+        }
+
+        [Test]
+        public void Under_IconsInOtherColumns_Ignored()
+        {
+            var left = new HudRect { X = 10f, Y = 300f, Width = 200f, Height = 60f };
+            HudRect r = SmallCameraLayout.Place(1920, 1080, 450, 1900f, 290f, 10f, 20f, 0f, 0f, left, StatusIconPlacement.Under);
+            Assert.That(r.Y, Is.EqualTo(300f));
+        }
+
+        [TestCase(1)]   // StatusIconPlacement.Behind (the enum is internal: passed as int)
+        [TestCase(2)]   // StatusIconPlacement.OnTop
+        public void BehindAndOnTop_KeepPlace(int placement)
+        {
+            var p = (StatusIconPlacement)placement;
+            HudRect r = SmallCameraLayout.Place(1920, 1080, 450, 1900f, 290f, 10f, 20f, 0f, 0f, Icons, p);
+            Assert.That(r.Y, Is.EqualTo(300f));
+            Assert.That(r.UnderIcons, Is.False);
+        }
+
+        [Test]
+        public void Under_StillStaysOnScreen()
+        {
+            var tall = new HudRect { X = 1700f, Y = 300f, Width = 200f, Height = 600f };
+            HudRect r = SmallCameraLayout.Place(1920, 1080, 540, 1900f, 290f, 10f, 20f, 0f, 0f, tall, StatusIconPlacement.Under);
+            Assert.That(r.Bottom, Is.LessThanOrEqualTo(1080f));
+            Assert.That(r.Clamped, Is.True);
+        }
     }
 }

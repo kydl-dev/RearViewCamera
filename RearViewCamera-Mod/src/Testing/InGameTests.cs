@@ -26,7 +26,7 @@ namespace RearViewCamera.Testing
             bool map = RearViewController.TryMinimapEdges(out float right, out float bottom);
             var r = RearViewCamera.Logic.SmallCameraLayout.Place(UnityEngine.Screen.width, UnityEngine.Screen.height, ModSettings.SmallHeight.Value,
                 map ? right : (float?)null, map ? bottom : (float?)null, ModSettings.MinimapGap.Value, ModSettings.ScreenMargin.Value,
-                ModSettings.SmallOffsetX.Value, ModSettings.SmallOffsetY.Value);
+                ModSettings.SmallOffsetX.Value, ModSettings.SmallOffsetY.Value, null, ModSettings.StatusEffects.Value);
             ModLog.Verbose("InGameTests: World_SmallCameraLayout " + r + (map ? " (minimap right " + right.ToString("F0") + ", bottom " + bottom.ToString("F0") + " px)" : " (no minimap)"));
             bool inside = r.X >= 0 && r.Y >= 0 && r.X + r.Width <= UnityEngine.Screen.width + 0.5f && r.Y + r.Height <= UnityEngine.Screen.height + 0.5f;
             bool ratio = System.Math.Abs(r.Width - System.Math.Round(r.Height * 16.0 / 9.0)) < 0.5;

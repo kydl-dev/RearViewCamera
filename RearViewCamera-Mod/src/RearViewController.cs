@@ -19,6 +19,10 @@ namespace RearViewCamera
         static readonly RearViewKeyLogic Logic = new RearViewKeyLogic(s => ModLog.Verbose(s));
         static readonly RearViewRenderer Renderer = new RearViewRenderer();
         static readonly RearViewInputBlocker Blocker = new RearViewInputBlocker();
+        static readonly HudProbe Probe = new HudProbe();
+        const int PanelOrderAboveHud = 500;     // UiKit's own default: over every game canvas
+        static int _panelOrder = PanelOrderAboveHud;
+        static bool _behindWarned;
         static readonly Vector3[] Corners = new Vector3[4];
 
         static RearViewHudView _hud;
@@ -179,16 +183,41 @@ namespace RearViewCamera
         static HudRect PlaceSmall()
         {
             bool found = TryMinimapEdges(out float right, out float bottom);
+            StatusIconPlacement placement = ModSettings.StatusEffects.Value;
+            bool icons = Probe.TryStatusIcons(out HudRect iconRect);
+            ApplyLayer(placement);
             HudRect r = SmallCameraLayout.Place(Screen.width, Screen.height, ModSettings.SmallHeight.Value,
                 found ? right : (float?)null, found ? bottom : (float?)null,
-                ModSettings.MinimapGap.Value, ModSettings.ScreenMargin.Value, ModSettings.SmallOffsetX.Value, ModSettings.SmallOffsetY.Value);
+                ModSettings.MinimapGap.Value, ModSettings.ScreenMargin.Value, ModSettings.SmallOffsetX.Value, ModSettings.SmallOffsetY.Value,
+                icons ? iconRect : (HudRect?)null, placement);
             if (!r.SameAs(_lastRect))
             {
-                ModLog.Verbose("Controller: small window " + _lastRect + " -> " + r + (found ? " (minimap right " + right.ToString("F0") + " px, bottom " + bottom.ToString("F0") + " px)" : ""));
+                ModLog.Verbose("Controller: small window " + _lastRect + " -> " + r + (found ? " (minimap right " + right.ToString("F0") + " px, bottom " + bottom.ToString("F0") + " px)" : "")
+                    + ", status icons " + (icons ? iconRect.Width.ToString("F0") + "x" + iconRect.Height.ToString("F0") + " px at (" + iconRect.X.ToString("F0") + ", " + iconRect.Y.ToString("F0") + ")" : "none") + ", placement " + placement);
                 ModLog.Check("Controller: small window width", r.Width, Mathf.Round(SmallCameraLayout.ClampHeight(ModSettings.SmallHeight.Value) * 16f / 9f), 0.5, "px");
                 _lastRect = r;
             }
             return r;
+        }
+
+        /// Behind (D-037): the Kydl panel is sorted just under the HUD canvas so the status icons draw over the picture (UI Toolkit panels and
+        /// Screen Space - Overlay canvases share one sorting order, SortOrderProbe). Under / OnTop: over every game canvas.
+        static void ApplyLayer(StatusIconPlacement placement)
+        {
+            int wanted = PanelOrderAboveHud;
+            if (placement == StatusIconPlacement.Behind)
+            {
+                if (Probe.TryHudCanvasOrder(out int hudOrder)) wanted = hudOrder - 1;
+                else if (!_behindWarned)
+                {
+                    ModLog.Warn("Controller: StatusEffects = Behind needs the game's HUD on a Screen Space - Overlay canvas; it is not, so the camera stays on top");
+                    _behindWarned = true;
+                }
+            }
+            if (wanted == _panelOrder || UiKit.Settings == null) return;
+            ModLog.Verbose("Controller: panel sorting order " + _panelOrder + " -> " + wanted + " (StatusEffects " + placement + ")");
+            UiKit.Settings.sortingOrder = wanted;
+            _panelOrder = wanted;
         }
 
         /// The small minimap's right and bottom edge in screen pixels from the top-left. Expected outcome: whether a visible minimap was found.
