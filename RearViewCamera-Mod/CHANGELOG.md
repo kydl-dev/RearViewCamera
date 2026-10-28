@@ -1,7 +1,5 @@
 # Changelog
 
-Newest version first. The top `## x.y.z` heading = `Plugin.ModVersion` = `manifest.json` `version_number` (integration tests check it).
-
 ## 1.0.0
 - First release.
 - Small rear-view window under the minimap (16:9, 640x360 to 960x540, default 800x450): key N, toggle or hold.
