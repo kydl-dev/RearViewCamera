@@ -75,3 +75,10 @@ Desktop.ini
 /*-Mod/release/*/release-gate.*
 /*-Mod/release/*/_stage/
 /*-Mod/release/*/*.zip
+
+# --- not published to GitHub (user, 2026-10-29) ---
+/_testruns/
+/_agent/
+/.claude/
+/CLAUDE.md
+/*-Mod/build/*.dll
