@@ -1,0 +1,15 @@
+{
+  "name": "RearViewCamera",
+  "description": "RearViewCamera: starts clean, its tab is in the KY hub, its own in-game checks pass (KydlCore D-084: every mod ships a suite)",
+  "requireMods": [
+    {
+      "guid": "com.kydldev.RearViewCamera"
+    }
+  ],
+  "configOverrides": [],
+  "resetBetweenTests": true,
+  "tests": [
+    "startup-clean",
+    "hub-page"
+  ]
+}

@@ -3,7 +3,7 @@
 See what is coming from behind - and dodge it. A small live rear-view window sits under your minimap, and holding one key shows the
 view behind you on the whole screen. Your character keeps facing forward the whole time.
 
-Client-only: install it on your own game; servers and other players do not need it.
+Client-only: install it on your own game; servers and other players do not need it. Needs the **KydlCore** mod (the shared UI: panel, input lock, KY hub with all settings on F6).
 
 ## Features
 - **Small rear view** under the minimap (16:9, 640x360 to 960x540 screen pixels, default 800x450), shown with a toggle or while a key is held.

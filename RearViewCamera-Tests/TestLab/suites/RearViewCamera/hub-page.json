@@ -1,0 +1,42 @@
+{
+  "name": "hub-page",
+  "description": "The mod has at least one tab in the KY hub and the hub can open straight to it",
+  "timeout": 60,
+  "steps": [
+    {
+      "do": "hook",
+      "name": "kc.hubOpen",
+      "args": {
+        "mod": "com.kydldev.RearViewCamera"
+      },
+      "expect": true
+    },
+    {
+      "do": "wait",
+      "seconds": 1
+    },
+    {
+      "do": "hook",
+      "name": "kc.hubMods",
+      "contains": "com.kydldev.RearViewCamera"
+    },
+    {
+      "do": "hook",
+      "name": "kc.hubTabCount",
+      "args": {
+        "mod": "com.kydldev.RearViewCamera"
+      },
+      "min": 1
+    },
+    {
+      "do": "hook",
+      "name": "kc.hubClose"
+    }
+  ],
+  "asserts": [
+    {
+      "check": "noErrors",
+      "source": "RearViewCamera"
+    }
+  ]
+}

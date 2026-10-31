@@ -16,13 +16,14 @@ namespace RearViewCamera
     /// </summary>
     [BepInPlugin(ModGuid, ModName, ModVersion)]
     [BepInDependency(Jotunn.Main.ModGuid)]
+    [BepInDependency(KydlCore.Plugin.ModGuid, "0.1.0")]     // the UI (panel, input lock, KY hub): manifest KydlDev-KydlCore-0.1.0, same version
     [NetworkCompatibility(CompatibilityLevel.NotEnforced, VersionStrictness.None)]   // client-only (D-004, D-020)
     public class Plugin : BaseUnityPlugin
     {
         // ModGuid never changes after the first release. ModVersion = manifest.json version_number = newest CHANGELOG heading (tests check it).
         public const string ModGuid = "com.kydldev.RearViewCamera";
         public const string ModName = "RearViewCamera";
-        public const string ModVersion = "1.0.0";
+        public const string ModVersion = "2.0.0";
         public const string BundleName = "rearviewcamera";
 
         internal static Plugin Instance;
@@ -36,12 +37,7 @@ namespace RearViewCamera
             ModLog.Init(Logger, ModName, () => ModSettings.DebugLog != null && ModSettings.DebugLog.Value);
             ModLog.Info(ModName + " " + ModVersion + " loaded (dll built " + File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location).ToString("yyyy-MM-dd HH:mm:ss") + ")");
 
-            // the shared UI kit (Kydl.Ui) logs through the mod's log: debug lines only with the debug switch on
-            Kydl.Ui.UiLog.VerboseSink = s => ModLog.Verbose(s);
-            Kydl.Ui.UiLog.WarnSink = s => ModLog.Warn(s);
-            Kydl.Ui.UiLog.ErrorSink = s => ModLog.Error(s);
-            Kydl.Ui.UiKit.Owner = ModName;
-
+            // 2.0.0: KydlCore owns the UI root, the log sinks of the UI kit and the input lock - this mod sets none of them
             ModSettings.Bind(Config);
             _cfgWatcher = new ConfigReloader(Config);
             Loc.Register(UiText.En);

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.0
+- Breaking: RearViewCamera now needs the KydlCore mod (hard dependency). Install KydlCore as well.
+- The rear-view window and its notices are drawn on KydlCore's one UI panel; the mod has no panel, log hook or input lock of its own any more.
+- All settings are on the automatic Settings tab of RearViewCamera in the KY hub window (F6).
+- `[General] EnableAll` and `[DebugLog] Enable` as before.
+
 ## 1.0.0
 - First release.
 - Small rear-view window under the minimap (16:9, 640x360 to 960x540, default 800x450): key N, toggle or hold.

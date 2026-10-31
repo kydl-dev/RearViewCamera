@@ -58,6 +58,7 @@ namespace RearViewCamera
         {
             try
             {
+                KeepCoreWindowsOnTop();
                 TickNotice();
                 if (_disabledForSession) return _shown;
                 return TickInner();
@@ -301,12 +302,32 @@ namespace RearViewCamera
             return r;
         }
 
+        static bool _coreOpenLast;
+
+        /// 2.0.0: the panel is KydlCore's ONE panel, shared with the KY hub and every mod window. While one of them is open the panel must stay over the HUD
+        /// (a hub under the status icons would be unusable); the "Behind" order comes back when they are closed. Expected outcome: true = a Core window is open.
+        static bool CoreWindowOpen() { return KydlCore.KyUi.AnyOpen || KydlCore.KyHub.IsOpen; }
+
+        /// Called every frame (also while the rear view is off): puts the panel over the HUD the moment a Core window opens.
+        static void KeepCoreWindowsOnTop()
+        {
+            bool open = CoreWindowOpen();
+            if (open == _coreOpenLast) return;
+            _coreOpenLast = open;
+            if (open && UiKit.Settings != null && _panelOrder != PanelOrderAboveHud)
+            {
+                ModLog.Verbose("Controller: a KydlCore window opened - panel sorting order " + _panelOrder + " -> " + PanelOrderAboveHud);
+                UiKit.Settings.sortingOrder = PanelOrderAboveHud;
+                _panelOrder = PanelOrderAboveHud;
+            }
+        }
+
         /// Behind (D-037): the Kydl panel is sorted just under the HUD canvas so the status icons draw over the picture (UI Toolkit panels and
         /// Screen Space - Overlay canvases share one sorting order, SortOrderProbe). Under / OnTop: over every game canvas.
         static void ApplyLayer(StatusIconPlacement placement)
         {
             int wanted = PanelOrderAboveHud;
-            if (placement == StatusIconPlacement.Behind)
+            if (placement == StatusIconPlacement.Behind && !CoreWindowOpen())
             {
                 if (Probe.TryHudCanvasOrder(out int hudOrder)) wanted = hudOrder - 1;
                 else if (!_behindWarned)
