@@ -1,4 +1,5 @@
 using Kydl.Common;
+using UnityEngine;
 
 namespace RearViewCamera.Testing
 {
@@ -44,6 +45,27 @@ namespace RearViewCamera.Testing
                 + " -> " + k.FullKey + " (" + k.FullState + ")";
             if (k.SmallState == RearViewCamera.Logic.KeyState.Off || k.FullState == RearViewCamera.Logic.KeyState.Off) return "FAIL: a key and its backup are taken - " + detail;
             return "PASS: " + detail;
+        }
+
+        /// User 2026-10-31 (camera inside a hill showed "a clear cut through the ground"): a wanted camera position under the ground comes out above it,
+        /// and the way from the eye to the result crosses no solid.
+        static string World_CameraOutOfTerrain()
+        {
+            var p = Player.m_localPlayer;
+            if (p == null) return "SKIP: no local player";
+            Vector3 eye = p.GetEyePoint();
+            Vector3 back = -p.transform.forward;
+            Vector3 wanted = eye + back * 12f;
+            var zs = ZoneSystem.instance;
+            if (zs == null) return "SKIP: no ZoneSystem";
+            float ground = zs.GetGroundHeight(wanted);
+            wanted.y = ground - 6f;                                  // 6 m inside the hill / ground
+            Vector3 got = Rendering.RearViewRenderer.OutOfTerrain(eye, wanted);
+            float groundAtGot = zs.GetGroundHeight(got);
+            bool aboveGround = got.y >= groundAtGot + 0.4f;
+            string detail = "wanted " + (wanted.y - ground).ToString("F1") + " m under the ground, camera ends " + (got.y - groundAtGot).ToString("F2") + " m above it (min 0.40), moved " + Vector3.Distance(wanted, got).ToString("F1") + " m";
+            ModLog.Verbose("InGameTests: World_CameraOutOfTerrain " + detail);
+            return (aboveGround ? "PASS: " : "FAIL: ") + detail;
         }
 
         /// What is shown right now (manual test: press N / hold J, then PageDown to re-run).

@@ -210,6 +210,7 @@ namespace RearViewCamera.Rendering
             Vector3 position = eye - look * ModSettings.CameraDistance.Value + Vector3.up * ModSettings.CameraHeight.Value;
             Quaternion rotation = Quaternion.LookRotation(-look, Vector3.up);
             _lift.Apply(player, eye, look, ref position, ref rotation);     // R7: over an animal that is in the way
+            position = OutOfTerrain(eye, position);                         // user 2026-10-31: behind a hill the camera sat INSIDE the ground and showed the void through it
 
             ApplyCameraSettings();
             if (_quality == RenderQuality.Full) _grading.Refresh(GameCameraNow());
@@ -227,6 +228,31 @@ namespace RearViewCamera.Rendering
                 ModLog.Verbose("Renderer: first frame rendered at " + position.ToString("F2") + ", eye " + eye.ToString("F2") + ", looking " + (-look).ToString("F2")
                     + ", " + ModSettings.CameraDistance.Value + " m behind, " + ModSettings.CameraHeight.Value + " m up");
             return _renders > 0;
+        }
+
+        // Terrain and solid pieces are single-sided: a camera that ends up inside a hill (the player stands with a slope or wall right behind) sees the inside of the ground, i.e. through it
+        // into the empty sky ("a clear cut through the ground into oblivion"). The camera therefore (1) stops in front of whatever solid lies between the eye and the wanted
+        // position (a line cast), and (2) never sits lower than GroundClearance above the terrain at its place.
+        const float GroundClearance = 0.5f, WallClearance = 0.3f;
+        static int _solidMask;
+        internal static Vector3 OutOfTerrain(Vector3 eye, Vector3 wanted)
+        {
+            if (_solidMask == 0) _solidMask = LayerMask.GetMask("terrain", "static_solid", "Default", "piece");
+            var to = wanted - eye;
+            float len = to.magnitude;
+            if (len > 0.01f)
+            {
+                RaycastHit hit;
+                if (Physics.Raycast(eye, to / len, out hit, len, _solidMask, QueryTriggerInteraction.Ignore))
+                    wanted = eye + (to / len) * Mathf.Max(0f, hit.distance - WallClearance);
+            }
+            var zs = ZoneSystem.instance;
+            if (zs != null)
+            {
+                float ground = zs.GetGroundHeight(wanted) + GroundClearance;
+                if (wanted.y < ground) wanted.y = ground;
+            }
+            return wanted;
         }
 
         /// Destroys camera and texture. Expected outcome: returns whether both are gone.
