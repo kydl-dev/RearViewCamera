@@ -30,7 +30,7 @@ namespace RearViewCamera.Tests.Integration
 
         static string PluginConst(string name)
         {
-            var m = Regex.Match(File.ReadAllText(Path.Combine(TestPaths.ModDir, "src", "Plugin.cs")), "const string " + name + @"\s*=\s*""([^""]*)""");
+            var m = Regex.Match(File.ReadAllText(Path.Combine(TestPaths.Src, "Bootstrap", "Plugin.cs")), "const string " + name + @"\s*=\s*""([^""]*)""");
             Assert.That(m.Success, Is.True, "const " + name + " not found in src/Plugin.cs");
             return m.Groups[1].Value;
         }

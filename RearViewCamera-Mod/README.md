@@ -45,7 +45,7 @@ Client-only: install it on your own game; servers and other players do not need 
 | DebugLog | Enable | false | Detailed lines in the BepInEx log for bug reports |
 
 ## Multiplayer
-Client-only: nothing is synced, and the server and other players do not need the mod.
+Client-only: nothing is synced, and the server and other players do not need the mod. If the server has it too, both must have exactly the same version.
 
 ## Notes
 - If the rear view runs into repeated errors it first drops the colour grading, then uses a plain camera, and finally switches itself

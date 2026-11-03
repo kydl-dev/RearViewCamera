@@ -1,0 +1,34 @@
+{
+  "name": "fullscreen-hold",
+  "description": "The full-screen rear view shows only while J is held (D-005)",
+  "timeout": 60,
+  "steps": [
+    {
+      "do": "hook",
+      "name": "RearViewCamera.arena",
+      "contains": "arena at",
+      "label": "start on the arena spot"
+    },
+    {
+      "do": "pressKey",
+      "key": "J",
+      "frames": 120
+    },
+    {
+      "do": "wait",
+      "until": {
+        "check": "hook",
+        "name": "RearViewCamera.shown",
+        "expect": "Off"
+      },
+      "timeout": 10,
+      "label": "released: off again"
+    }
+  ],
+  "asserts": [
+    {
+      "check": "noErrors",
+      "source": "RearViewCamera"
+    }
+  ]
+}

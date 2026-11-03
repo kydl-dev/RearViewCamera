@@ -1,0 +1,95 @@
+{
+  "name": "enableall-off",
+  "description": "EnableAll off: the feature stops and the key shows nothing; on again: it works (PROJECT_RULES 11)",
+  "timeout": 60,
+  "steps": [
+    {
+      "do": "hook",
+      "name": "RearViewCamera.arena",
+      "contains": "arena at",
+      "label": "start on the arena spot"
+    },
+    {
+      "do": "setConfig",
+      "values": {
+        "General/EnableAll": false
+      }
+    },
+    {
+      "do": "wait",
+      "until": {
+        "check": "hook",
+        "name": "RearViewCamera.featureRunning",
+        "args": {
+          "id": "rear-view"
+        },
+        "expect": false
+      },
+      "timeout": 5
+    },
+    {
+      "do": "pressKey",
+      "key": "N"
+    },
+    {
+      "do": "wait",
+      "seconds": 1
+    },
+    {
+      "do": "hook",
+      "name": "RearViewCamera.shown",
+      "expect": "Off",
+      "label": "nothing while off"
+    },
+    {
+      "do": "setConfig",
+      "values": {
+        "General/EnableAll": true
+      }
+    },
+    {
+      "do": "wait",
+      "until": {
+        "check": "hook",
+        "name": "RearViewCamera.featureRunning",
+        "args": {
+          "id": "rear-view"
+        },
+        "expect": true
+      },
+      "timeout": 5
+    },
+    {
+      "do": "pressKey",
+      "key": "N"
+    },
+    {
+      "do": "wait",
+      "until": {
+        "check": "hook",
+        "name": "RearViewCamera.shown",
+        "expect": "Small"
+      },
+      "timeout": 5
+    },
+    {
+      "do": "pressKey",
+      "key": "N"
+    },
+    {
+      "do": "wait",
+      "until": {
+        "check": "hook",
+        "name": "RearViewCamera.shown",
+        "expect": "Off"
+      },
+      "timeout": 5
+    }
+  ],
+  "asserts": [
+    {
+      "check": "noErrors",
+      "source": "RearViewCamera"
+    }
+  ]
+}

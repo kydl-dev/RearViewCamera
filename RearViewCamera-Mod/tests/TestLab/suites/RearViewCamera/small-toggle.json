@@ -1,0 +1,50 @@
+{
+  "name": "small-toggle",
+  "description": "The small window: key N (Toggle mode) shows it, N again hides it",
+  "timeout": 60,
+  "steps": [
+    {
+      "do": "hook",
+      "name": "RearViewCamera.arena",
+      "contains": "arena at",
+      "label": "start on the arena spot"
+    },
+    {
+      "do": "hook",
+      "name": "RearViewCamera.shown",
+      "expect": "Off"
+    },
+    {
+      "do": "pressKey",
+      "key": "N"
+    },
+    {
+      "do": "wait",
+      "until": {
+        "check": "hook",
+        "name": "RearViewCamera.shown",
+        "expect": "Small"
+      },
+      "timeout": 5
+    },
+    {
+      "do": "pressKey",
+      "key": "N"
+    },
+    {
+      "do": "wait",
+      "until": {
+        "check": "hook",
+        "name": "RearViewCamera.shown",
+        "expect": "Off"
+      },
+      "timeout": 5
+    }
+  ],
+  "asserts": [
+    {
+      "check": "noErrors",
+      "source": "RearViewCamera"
+    }
+  ]
+}

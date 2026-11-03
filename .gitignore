@@ -90,3 +90,11 @@ CLAUDE.md
 /model.png
 /model-nobg.png
 *.dll
+
+# KydlDev spec layout (MIGRATION_DECISIONS A7/A8)
+/*-Mod/docs/
+/*-Mod/tests/**/bin/
+/*-Mod/tests/**/obj/
+/*-Mod/tests/.nuget/
+/*-Mod/tests/_quality/
+/*-Mod/assets/*.dll

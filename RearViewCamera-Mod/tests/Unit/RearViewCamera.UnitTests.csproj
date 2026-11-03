@@ -7,6 +7,6 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- pure rear-view logic (no Unity / Valheim types) -->
-    <Compile Include="..\..\RearViewCamera-Mod\src\Logic\*.cs" Link="Mod\Logic\%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\Features\*\Domain\**\*.cs" Link="Mod\Logic\%(Filename)%(Extension)" />
   </ItemGroup>
 </Project>

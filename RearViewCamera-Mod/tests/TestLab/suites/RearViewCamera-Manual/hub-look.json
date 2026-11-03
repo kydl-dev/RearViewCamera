@@ -1,0 +1,32 @@
+{
+  "name": "hub-look",
+  "description": "The mod's hub page looks right in the shared KydlCore theme (fonts, gold accents, nothing cut off) and F6 / Esc open and close it with real keys",
+  "manualOnly": true,
+  "timeout": 300,
+  "steps": [
+    {
+      "do": "hook",
+      "name": "RearViewCamera.arena",
+      "contains": "arena at",
+      "label": "start on the arena spot"
+    },
+    {
+      "do": "checkpoint",
+      "message": "Press N: is the small rear view under the minimap, sharp, the right way round, not through hills? Hold J: full-screen rear view, back on release?"
+    },
+    {
+      "do": "checkpoint",
+      "message": "Press F6, pick RearViewCamera. Does the page use the shared look (dark panel, gold accents, readable text, nothing cut off)?"
+    },
+    {
+      "do": "checkpoint",
+      "message": "Press Esc. Is the hub closed and can you move / look around again (input released)?"
+    }
+  ],
+  "asserts": [
+    {
+      "check": "noErrors",
+      "source": "RearViewCamera"
+    }
+  ]
+}

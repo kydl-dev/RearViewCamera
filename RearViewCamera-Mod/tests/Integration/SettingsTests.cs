@@ -44,7 +44,7 @@ namespace RearViewCamera.Tests.Integration
         [Test]
         public void PlayerConfig_HasDebugLogSwitch()
         {
-            var src = File.ReadAllText(Path.Combine(TestPaths.ModDir, "src", "ModSettings.cs"));
+            var src = File.ReadAllText(Path.Combine(TestPaths.Src, "Configuration", "ModSettings.cs"));
 
             Assert.That(Regex.IsMatch(src, @"Bind\(\s*""DebugLog""\s*,\s*""Enable""\s*,\s*false"), Is.True, "[DebugLog] Enable (off by default) is required in every mod");
         }
@@ -52,7 +52,7 @@ namespace RearViewCamera.Tests.Integration
         [Test]
         public void ConfigDescriptions_DoNotTalkAboutOldVersions()
         {
-            var src = File.ReadAllText(Path.Combine(TestPaths.ModDir, "src", "ModSettings.cs"));
+            var src = File.ReadAllText(Path.Combine(TestPaths.Src, "Configuration", "ModSettings.cs"));
 
             foreach (Match m in Regex.Matches(src, @"Bind\([^;]*?""(?<d>[^""]{20,})"""))
                 Assert.That(Regex.IsMatch(m.Groups["d"].Value, @"\b(previous|formerly|renamed|old value|used to|before version)\b", RegexOptions.IgnoreCase), Is.False, m.Groups["d"].Value);

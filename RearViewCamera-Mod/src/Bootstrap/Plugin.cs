@@ -17,19 +17,21 @@ namespace RearViewCamera
     [BepInPlugin(ModGuid, ModName, ModVersion)]
     [BepInDependency(Jotunn.Main.ModGuid)]
     [BepInDependency(KydlCore.Plugin.ModGuid, "0.1.0")]     // the UI (panel, input lock, KY hub): manifest KydlDev-KydlCore-0.1.0, same version
-    [NetworkCompatibility(CompatibilityLevel.NotEnforced, VersionStrictness.None)]   // client-only (D-004, D-020)
+    // client-only (D-004, D-020): joins servers without it; the same exact version when the server has it too (MIGRATION_DECISIONS network rule)
+    [NetworkCompatibility(CompatibilityLevel.VersionCheckOnly, VersionStrictness.Patch)]
     public class Plugin : BaseUnityPlugin
     {
         // ModGuid never changes after the first release. ModVersion = manifest.json version_number = newest CHANGELOG heading (tests check it).
         public const string ModGuid = "com.kydldev.RearViewCamera";
         public const string ModName = "RearViewCamera";
-        public const string ModVersion = "2.0.0";
+        public const string ModVersion = "2.1.0";
         public const string BundleName = "rearviewcamera";
 
         internal static Plugin Instance;
         /// This mod's AssetBundle (null while the mod has none yet: Unity has not built one).
         internal static AssetBundle Bundle;
         ConfigReloader _cfgWatcher;
+        Bootstrap.ModInstaller _installer;
 
         void Awake()
         {
@@ -43,8 +45,11 @@ namespace RearViewCamera
             Loc.Register(UiText.En);
 
             Bundle = LoadBundle();
-            new Harmony(ModGuid).PatchAll(Assembly.GetExecutingAssembly());
-            ModLog.Verbose("Plugin: Awake finished (Harmony patches applied, small key " + ModSettings.SmallCameraKey.Value + " " + ModSettings.SmallCameraKeyMode.Value + ", full-screen key " + ModSettings.FullScreenKey.Value + ")");
+            new Harmony(ModGuid).PatchAll(Assembly.GetExecutingAssembly());      // no Harmony patches today; new ones go into src/Integrations/Harmony
+            _installer = new Bootstrap.ModInstaller(Config);
+            bool installed = _installer.Install();
+            Config.SettingChanged += (s, e) => { if (_installer != null) _installer.Refresh(); };
+            ModLog.Verbose("Plugin: Awake finished (architecture " + Core.Architecture.Tag + ", features " + (installed ? "started" : "had failures") + ", small key " + ModSettings.SmallCameraKey.Value + " " + ModSettings.SmallCameraKeyMode.Value + ", full-screen key " + ModSettings.FullScreenKey.Value + ")");
         }
 
         // 1) embedded in the DLL (Kydl.Mod.targets embeds Assets\<bundle>; read fully into memory: LoadFromStream breaks once the stream
@@ -86,6 +91,7 @@ namespace RearViewCamera
         void OnDestroy()
         {
             if (_cfgWatcher != null) { _cfgWatcher.Dispose(); _cfgWatcher = null; }
+            if (_installer != null) { _installer.Uninstall(); _installer = null; }
             RearViewController.Shutdown();
             ModLog.Verbose("Plugin: destroyed");
         }

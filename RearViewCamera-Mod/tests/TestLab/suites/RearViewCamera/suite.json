@@ -1,0 +1,114 @@
+{
+  "name": "RearViewCamera",
+  "description": "RearViewCamera (client-only rear view): loads with its exact KydlCore, settings tab in the KY hub, the small window toggles with its key, the full-screen view only while its key is held, EnableAll off shows nothing (MIGRATION_DECISIONS C14-C26)",
+  "requireMods": [
+    {
+      "guid": "com.kydldev.RearViewCamera",
+      "minVersion": "2.1.0"
+    },
+    {
+      "guid": "com.kydldev.KydlCore",
+      "minVersion": "0.1.0"
+    }
+  ],
+  "configOverrides": [
+    {
+      "guid": "com.kydldev.RearViewCamera",
+      "section": "General",
+      "key": "EnableAll",
+      "value": "true"
+    },
+    {
+      "guid": "com.kydldev.RearViewCamera",
+      "section": "Controls",
+      "key": "SmallCameraKey",
+      "value": "N"
+    },
+    {
+      "guid": "com.kydldev.RearViewCamera",
+      "section": "Controls",
+      "key": "SmallCameraKeyMode",
+      "value": "Toggle"
+    },
+    {
+      "guid": "com.kydldev.RearViewCamera",
+      "section": "Controls",
+      "key": "FullScreenKey",
+      "value": "J"
+    },
+    {
+      "guid": "com.kydldev.RearViewCamera",
+      "section": "SmallCamera",
+      "key": "Height",
+      "value": "450"
+    },
+    {
+      "guid": "com.kydldev.RearViewCamera",
+      "section": "SmallCamera",
+      "key": "OffsetX",
+      "value": "0"
+    },
+    {
+      "guid": "com.kydldev.RearViewCamera",
+      "section": "SmallCamera",
+      "key": "OffsetY",
+      "value": "0"
+    },
+    {
+      "guid": "com.kydldev.RearViewCamera",
+      "section": "SmallCamera",
+      "key": "StatusEffects",
+      "value": "Under"
+    },
+    {
+      "guid": "com.kydldev.RearViewCamera",
+      "section": "Camera",
+      "key": "DistanceBehind",
+      "value": "0.65"
+    },
+    {
+      "guid": "com.kydldev.RearViewCamera",
+      "section": "Camera",
+      "key": "HeightOffset",
+      "value": "0"
+    },
+    {
+      "guid": "com.kydldev.RearViewCamera",
+      "section": "Camera",
+      "key": "FieldOfView",
+      "value": "75"
+    },
+    {
+      "guid": "com.kydldev.RearViewCamera",
+      "section": "Camera",
+      "key": "UpdateFPS",
+      "value": "15"
+    },
+    {
+      "guid": "com.kydldev.RearViewCamera",
+      "section": "Camera",
+      "key": "MirrorImage",
+      "value": "false"
+    },
+    {
+      "guid": "com.kydldev.RearViewCamera",
+      "section": "DebugLog",
+      "key": "Enable",
+      "value": "true"
+    }
+  ],
+  "setup": {
+    "timeOfDay": 0.5,
+    "freezeTime": 1,
+    "god": 1,
+    "hideUnlockPopups": 1
+  },
+  "resetBetweenTests": true,
+  "tests": [
+    "startup-clean",
+    "hub-page",
+    "small-toggle",
+    "fullscreen-hold",
+    "enableall-off"
+  ]
+}

@@ -3,7 +3,7 @@
 See what is coming from behind - and dodge it. A small live rear-view window sits under your minimap, and holding one key shows the
 view behind you on the whole screen. Your character keeps facing forward the whole time.
 
-Client-only: install it on your own game; servers and other players do not need it.
+Client-only: install it on your own game; servers and other players do not need it. Needs the **KydlCore** mod (the shared UI: panel, input lock, KY hub with all settings on F6).
 
 ## Features
 - **Small rear view** under the minimap (16:9, 640x360 to 960x540 screen pixels, default 800x450), shown with a toggle or while a key is held.
@@ -45,7 +45,7 @@ Client-only: install it on your own game; servers and other players do not need 
 | DebugLog | Enable | false | Detailed lines in the BepInEx log for bug reports |
 
 ## Multiplayer
-Client-only: nothing is synced, and the server and other players do not need the mod.
+Client-only: nothing is synced, and the server and other players do not need the mod. If the server has it too, both must have exactly the same version.
 
 ## Notes
 - If the rear view runs into repeated errors it first drops the colour grading, then uses a plain camera, and finally switches itself
@@ -54,7 +54,3 @@ Client-only: nothing is synced, and the server and other players do not need the
 
 ## Bug reports
 Turn on `[DebugLog] Enable`, reproduce the problem, and attach `BepInEx/LogOutput.log`.
-
-## License
-
-MIT, see [LICENSE](LICENSE). You are free to use and modify this mod. If you redistribute it or a modified version, keep the copyright notice and credit **kydl-dev** as the original author.
