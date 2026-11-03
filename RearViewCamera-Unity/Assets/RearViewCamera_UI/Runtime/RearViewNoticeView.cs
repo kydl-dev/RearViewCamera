@@ -1,4 +1,4 @@
-using Kydl.Ui;
+using KydlCore.Ui;
 using UnityEngine;
 using UnityEngine.UIElements;
 

@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 using BepInEx.Bootstrap;
-using Kydl.Common;
+using KydlCore.Common;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

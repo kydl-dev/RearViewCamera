@@ -1,11 +1,11 @@
-using Kydl.Ui;
+using KydlCore.Ui;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace RearViewCamera.Ui
 {
     /// <summary>
-    /// WHAT the rear view looks like on screen (UI Toolkit, shared Kydl.Ui panel and colours, D-011). HUD, not a menu (D-015): not movable,
+    /// WHAT the rear view looks like on screen (UI Toolkit, shared KydlCore.Ui panel and colours, D-011). HUD, not a menu (D-015): not movable,
     /// never takes input (picking ignored), no input lock; full screen covers the whole panel. Compiled into the mod AND shown by the Unity
     /// preview (Assets/RearViewCamera_UI/Preview/MenuPreview.cs). No game types here; the game side is src/RearViewController.cs.
     /// All sizes passed in are PANEL units (the controller converts from screen pixels).

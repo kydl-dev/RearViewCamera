@@ -3,7 +3,7 @@ using System.Reflection;
 using BepInEx;
 using HarmonyLib;
 using Jotunn.Utils;
-using Kydl.Common;
+using KydlCore.Common;
 using RearViewCamera.Ui;
 using UnityEngine;
 
@@ -16,7 +16,7 @@ namespace RearViewCamera
     /// </summary>
     [BepInPlugin(ModGuid, ModName, ModVersion)]
     [BepInDependency(Jotunn.Main.ModGuid)]
-    [BepInDependency(KydlCore.Plugin.ModGuid, "0.1.0")]     // the UI (panel, input lock, KY hub): manifest KydlDev-KydlCore-0.1.0, same version
+    [BepInDependency(KydlCore.Bootstrap.Plugin.ModGuid, "0.1.0")]     // the UI (panel, input lock, KY hub): manifest KydlDev-KydlCore-0.1.0, same version
     // client-only (D-004, D-020): joins servers without it; the same exact version when the server has it too (MIGRATION_DECISIONS network rule)
     [NetworkCompatibility(CompatibilityLevel.VersionCheckOnly, VersionStrictness.Patch)]
     public class Plugin : BaseUnityPlugin

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
-using Kydl.Common;
+using KydlCore.Common;
 using RearViewCamera.Logic;
 using UnityEngine;
 

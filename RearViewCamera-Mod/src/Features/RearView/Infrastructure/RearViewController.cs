@@ -1,5 +1,5 @@
-using Kydl.Common;
-using Kydl.Ui;
+using KydlCore.Common;
+using KydlCore.Ui;
 using RearViewCamera.Game;
 using RearViewCamera.Logic;
 using RearViewCamera.Rendering;
@@ -306,7 +306,7 @@ namespace RearViewCamera
 
         /// 2.0.0: the panel is KydlCore's ONE panel, shared with the KY hub and every mod window. While one of them is open the panel must stay over the HUD
         /// (a hub under the status icons would be unusable); the "Behind" order comes back when they are closed. Expected outcome: true = a Core window is open.
-        static bool CoreWindowOpen() { return KydlCore.KyUi.AnyOpen || KydlCore.KyHub.IsOpen; }
+        static bool CoreWindowOpen() { return KydlCore.Features.Hub.Contracts.KyUi.AnyOpen || KydlCore.Features.Hub.Contracts.KyHub.IsOpen; }
 
         /// Called every frame (also while the rear view is off): puts the panel over the HUD the moment a Core window opens.
         static void KeepCoreWindowsOnTop()

@@ -1,5 +1,5 @@
 using System.Text;
-using Kydl.Common;
+using KydlCore.Common;
 using UnityEngine;
 using UnityEngine.Rendering;
 

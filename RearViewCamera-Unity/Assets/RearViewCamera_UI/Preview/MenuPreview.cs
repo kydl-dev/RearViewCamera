@@ -1,4 +1,4 @@
-using Kydl.Ui;
+using KydlCore.Ui;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -16,7 +16,7 @@ namespace RearViewCamera.Ui
     /// </summary>
     public sealed class MenuPreview : MonoBehaviour
     {
-        const string FontFolder = "Assets/Kydl.Ui/Preview/GameAssets/";
+        const string FontFolder = "Assets/KydlCore.Ui/Preview/GameAssets/";
 
         [SerializeField] private bool fullScreen;
         [SerializeField] private bool mirror;
