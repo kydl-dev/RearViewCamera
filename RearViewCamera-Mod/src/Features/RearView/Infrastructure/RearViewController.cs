@@ -134,6 +134,11 @@ internal static class RearViewController
                 UiOpeningKey = RearViewInputBlocker.UiOpeningKeyPressed()
             };
             wanted = Logic.Step(keys, ModSettings.SmallCameraKeyMode.Value);
+            if (keys.SmallPressed)
+            {
+                ModLog.Verbose("Controller: " + ModSettings.SmallCameraKey.Value + " pressed (" + ModSettings.SmallCameraKeyMode.Value + ") -> rear view " + wanted);
+            }
+
             _lastOffReason = "";
         }
         else if (offReason != _lastOffReason)
