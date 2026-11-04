@@ -14,7 +14,10 @@ public class FullScreenSizeTests
     public void Size(int sw, int sh, int max, int w, int h)
     {
         FullScreenSize.For(sw, sh, max, out int width, out int height);
-        Assert.That(height, Is.EqualTo(h));
-        Assert.That(width, Is.EqualTo(w));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(height, Is.EqualTo(h));
+            Assert.That(width, Is.EqualTo(w));
+        }
     }
 }
