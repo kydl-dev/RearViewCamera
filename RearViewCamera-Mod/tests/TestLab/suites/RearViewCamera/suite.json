@@ -4,11 +4,11 @@
   "requireMods": [
     {
       "guid": "com.kydldev.RearViewCamera",
-      "minVersion": "2.1.0"
+      "minVersion": "2.0.0"
     },
     {
       "guid": "com.kydldev.KydlCore",
-      "minVersion": "0.1.0"
+      "minVersion": "1.0.0"
     }
   ],
   "configOverrides": [

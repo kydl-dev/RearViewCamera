@@ -16,7 +16,7 @@ namespace RearViewCamera;
 /// </summary>
 [BepInPlugin(ModGuid, ModName, ModVersion)]
 [BepInDependency(Jotunn.Main.ModGuid)]
-[BepInDependency(KydlCore.Bootstrap.Plugin.ModGuid, "0.1.0")]     // the UI (panel, input lock, KY hub): manifest KydlDev-KydlCore-0.1.0, same version
+[BepInDependency(KydlCore.Bootstrap.Plugin.ModGuid, "1.0.0")]     // the UI (panel, input lock, KY hub): manifest KydlDev-KydlCore-1.0.0, same version
 // client-only (D-004, D-020): joins servers without it; the same exact version when the server has it too (MIGRATION_DECISIONS network rule)
 [NetworkCompatibility(CompatibilityLevel.VersionCheckOnly, VersionStrictness.Patch)]
 public class Plugin : BaseUnityPlugin
@@ -24,7 +24,7 @@ public class Plugin : BaseUnityPlugin
     // ModGuid never changes after the first release. ModVersion = manifest.json version_number = newest CHANGELOG heading (tests check it).
     public const string ModGuid = "com.kydldev.RearViewCamera";
     public const string ModName = "RearViewCamera";
-    public const string ModVersion = "2.1.0";
+    public const string ModVersion = "2.0.0";
     public const string BundleName = "rearviewcamera";
 
     internal static Plugin Instance;
