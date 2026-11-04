@@ -18,6 +18,7 @@ internal static class OccluderLift
     internal static void For(float eyeY, float occluderTopY, float clearance, float maxRaise, float lookAhead, out float raise, out float pitchDegrees)
     {
         raise = Math.Max(0f, Math.Min(maxRaise, occluderTopY + clearance - eyeY));
+        // Stryker disable once Equality : raise == 0 gives atan2(0, lookAhead) = 0 degrees anyway
         pitchDegrees = raise <= 0f || lookAhead <= 0f ? 0f : (float)Math.Min(89.0, Math.Atan2(raise, lookAhead) * 180.0 / Math.PI);
     }
 
@@ -25,6 +26,7 @@ internal static class OccluderLift
     internal static float Toward(float current, float target, float speed, float seconds)
     {
         float step = Math.Max(0f, speed * seconds);
+        // Stryker disable once Equality : a distance of exactly one step lands on the target either way
         if (Math.Abs(target - current) <= step) return target;
         return current + Math.Sign(target - current) * step;
     }

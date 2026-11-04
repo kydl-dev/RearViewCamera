@@ -28,6 +28,25 @@ public class OccluderLiftTests
         }
     }
 
+    [TestCase(0f)]
+    [TestCase(-5f)]
+    public void NoLookAheadDistance_NoTilt(float lookAhead)
+    {
+        OccluderLift.For(1.6f, 3f, 0.5f, 3f, lookAhead, out float raise, out float pitch);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(raise, Is.GreaterThan(0f));
+            Assert.That(pitch, Is.EqualTo(0f));
+        }
+    }
+
+    [Test]
+    public void Tilt_IsCappedAt89Degrees()
+    {
+        OccluderLift.For(1.6f, 3f, 0.5f, 3f, 0.01f, out _, out float pitch);
+        Assert.That(pitch, Is.EqualTo(89f).Within(0.0001f));
+    }
+
     [Test]
     public void Lift_IsCapped()
     {

@@ -46,7 +46,7 @@ internal sealed class RearViewKeyLogic
                 _log("RearViewKeyLogic: keys suppressed (" + (keys.Blocked ? "text entry open" : "UI-opening key pressed") + "), toggle stays " + OnOff(_toggleOn));
             _suppressed = true;
             next = KeptMode();
-            why = "keys suppressed";
+            why = "keys suppressed";   // logged on a change, covered by Reason_WhileBlocked_AFullScreenViewEnds
         }
         else if (_suppressed && (keys.SmallHeld || keys.FullHeld))
         {
@@ -115,6 +115,7 @@ internal sealed class RearViewKeyLogic
         }
         if (_mode == SmallCameraMode.Hold && keys.SmallHeld && wasSmall)
         {
+            // Stryker disable once String : only logged when the mode changes, and Small -> Small never is (wasSmall is required here)
             why = "large map open, small-camera key still held";
             return RearViewMode.Small;
         }

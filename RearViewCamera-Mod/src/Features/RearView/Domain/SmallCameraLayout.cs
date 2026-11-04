@@ -119,6 +119,7 @@ internal static class SmallCameraLayout
 
     static float Clamp(float v, float min, float max)
     {
+        // Stryker disable once Equality : a value exactly at the bound gives the same number from either branch
         return v < min ? min : (v > max ? max : v);
     }
 }

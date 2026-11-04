@@ -1,12 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!-- Unit tests: pure logic, no game running. Logic worth testing lives in classes without Unity / Valheim types; link those files here
-       (<Compile Include="..\..\RearViewCamera-Mod\src\...\X.cs" Link="Mod\X.cs" />) or reach them in the built DLL through ModAssembly. -->
+       (<Compile Include="..\..\RearViewCamera-Mod\src\...\X.cs" Link="Mod\X.cs" Condition="'$(KydlQuality)' != 'true'" />) or reach them in the built DLL through ModAssembly. -->
   <PropertyGroup>
     <AssemblyName>RearViewCamera.UnitTests</AssemblyName>
     <RootNamespace>RearViewCamera.Tests.Unit</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <!-- pure rear-view logic (no Unity / Valheim types) -->
-    <Compile Include="..\..\src\Features\*\Domain\**\*.cs" Link="Mod\Logic\%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\Features\*\Domain\**\*.cs" Link="Mod\Logic\%(Filename)%(Extension)" Condition="'$(KydlQuality)' != 'true'" />
+  </ItemGroup>
+  <!-- stryker-capture-refs: the mod derives from / calls types of these; copied next to the tests so every type of RearViewCamera.dll can be loaded (Stryker's coverage capture lists them; without them it fails and every mutant survives). Test-quality runs only. -->
+  <ItemGroup Condition="'$(KydlQuality)' == 'true'">
+    <Reference Include="Jotunn"><HintPath>$(ValheimRefs)\Jotunn.dll</HintPath><Private>true</Private></Reference>
+    <Reference Include="assembly_valheim"><HintPath>$(ValheimRefs)\assembly_valheim.dll</HintPath><Private>true</Private></Reference>
+    <Reference Include="assembly_utils"><HintPath>$(ValheimRefs)\assembly_utils.dll</HintPath><Private>true</Private></Reference>
+    <Reference Include="assembly_guiutils"><HintPath>$(ValheimRefs)\assembly_guiutils.dll</HintPath><Private>true</Private></Reference>
+    <Reference Include="UnityEngine.UI"><HintPath>$(ValheimRefs)\UnityEngine.UI.dll</HintPath><Private>true</Private></Reference>
+    <Reference Include="Unity.InputSystem"><HintPath>$(ValheimRefs)\Unity.InputSystem.dll</HintPath><Private>true</Private></Reference>
+    <Reference Include="Unity.TextMeshPro"><HintPath>$(ValheimRefs)\Unity.TextMeshPro.dll</HintPath><Private>true</Private></Reference>
+    <Reference Include="assembly_postprocessing"><HintPath>$(ValheimRefs)\assembly_postprocessing.dll</HintPath><Private>true</Private></Reference>
+    <Reference Include="KydlCore"><HintPath>$(MSBuildThisFileDirectory)..\..\..\..\KydlCore\KydlCore-Mod\assets\KydlCore.dll</HintPath><Private>true</Private></Reference>
   </ItemGroup>
 </Project>
