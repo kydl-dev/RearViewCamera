@@ -3,7 +3,7 @@
 ## 2.0.0
 - Version check with servers: you can still join any server without RearViewCamera; when the server has it too, both must have exactly the same version.
 - KydlCore hub (F6): the mod shows as "Rear View Camera" with its Settings tab.
-- Internal rebuild on the KydlDev standard (no change to the keys, settings or the picture). Not tested in game yet.
+- Internal rebuild on the KydlDev standard (no change to the keys, settings or the picture). Checked in game on 2026-11-04 (clean start and quit with all mods loaded, no errors from this mod).
 - Breaking: RearViewCamera now needs the KydlCore mod (hard dependency). Install KydlCore as well.
 - The rear-view window and its notices are drawn on KydlCore's one UI panel; the mod has no panel, log hook or input lock of its own any more.
 - All settings are on the automatic Settings tab of RearViewCamera in the KY hub window (F6).
